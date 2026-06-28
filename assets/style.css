@@ -84,6 +84,11 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--navy-dim);padd
 .hero{display:flex;align-items:center;gap:22px;margin:0 0 8px}
 .hero img{width:84px;height:84px;border-radius:20px;border:1px solid var(--border)}
 
+/* Demo animation (simulator-captured) */
+.demo{margin:30px 0 10px;display:flex;flex-direction:column;align-items:center;gap:11px}
+.demo img{width:300px;max-width:100%;height:auto;border-radius:30px;border:1px solid var(--border);box-shadow:0 20px 54px rgba(30,42,70,.20)}
+.demo figcaption{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.04em;color:var(--text-dim);text-align:center}
+
 /* Card grid — auto-fill minmax so it reflows from one column (phone) to
    two-plus (tablet/desktop) on its own. Never hardcode a column count. */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:13px}
