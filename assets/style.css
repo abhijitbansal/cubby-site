@@ -1,0 +1,113 @@
+/* Cubby site theme — shared by index/privacy/support.
+   Self-hosted fonts (latin subsets) — no third-party requests, no CDNs,
+   no trackers. The site mirrors the app's promise: nothing leaves your device. */
+@font-face{font-family:'Instrument Serif';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/instrument-serif-regular.woff2) format('woff2')}
+@font-face{font-family:'Instrument Serif';font-style:italic;font-weight:400;font-display:swap;src:url(fonts/instrument-serif-italic.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/jetbrains-mono.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3';font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/source-sans-3.woff2) format('woff2')}
+
+:root{
+  --bg:#f6f4ef;
+  --surface:#fffdf9;
+  --border:rgba(30,42,70,.13);
+  --border-strong:rgba(30,42,70,.3);
+  --text:#1c2438;
+  --text-dim:#5d6880;
+  --navy:#1e3a5f;
+  --navy-dim:rgba(30,58,95,.07);
+  --gold:#b8860b;
+  --gold-dim:rgba(184,134,11,.1);
+  --rose:#9f3a52;
+  --sage:#4a7c59;
+  --font-display:'Instrument Serif',Georgia,serif;
+  --font-body:'Source Sans 3',-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#151a26;
+    --surface:#1d2433;
+    --border:rgba(200,215,240,.12);
+    --border-strong:rgba(200,215,240,.3);
+    --text:#e6eaf2;
+    --text-dim:#9aa6bd;
+    --navy:#7da7d9;
+    --navy-dim:rgba(125,167,217,.1);
+    --gold:#d9a93f;
+    --gold-dim:rgba(217,169,63,.12);
+    --rose:#d97a91;
+    --sage:#7fb78f;
+  }
+}
+
+*{box-sizing:border-box;margin:0;min-width:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);line-height:1.55;padding:52px 24px 90px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1100px;margin:0 auto}
+/* Prose pages (privacy/support) share the full-width wrap so nav + footer
+   line up with the landing page; only the reading column is narrowed. */
+main.prose{max-width:760px}
+
+/* Top navigation */
+nav.site{font-family:var(--font-mono);font-size:12px;margin-bottom:34px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+nav.site img{width:26px;height:26px;border-radius:6px}
+nav.site .name{font-family:var(--font-display);font-size:18px;color:var(--text);margin-right:auto}
+nav.site a{color:var(--text-dim);text-decoration:none}
+nav.site a:hover{color:var(--text)}
+nav.site a[aria-current="page"]{color:var(--gold)}
+
+/* Page header */
+header.page{max-width:760px;margin-bottom:14px}
+.kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+h1{font-family:var(--font-display);font-size:clamp(38px,6vw,60px);font-weight:400;line-height:1.05;margin:10px 0 14px}
+h1 em{font-style:italic;color:var(--navy)}
+.lead{font-size:18px;color:var(--text-dim);max-width:640px}
+.lead b{color:var(--text)}
+
+/* Section headings with gold-accented rule */
+h2{font-family:var(--font-display);font-size:30px;font-weight:400;margin:46px 0 4px}
+.rule{height:1px;background:var(--border-strong);margin:6px 0 18px;position:relative}
+.rule::before{content:"";position:absolute;left:0;top:-1px;width:64px;height:3px;background:var(--gold)}
+h3{font-size:16px;font-weight:600;margin:26px 0 6px}
+
+/* Prose (privacy / support) */
+p{margin:0 0 14px}
+main p a,main li a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-dim)}
+main p a:hover,main li a:hover{border-bottom-color:var(--gold)}
+ul{padding-left:22px;margin:0 0 14px}
+li{margin-bottom:6px}
+code{font-family:var(--font-mono);font-size:12px;background:var(--navy-dim);padding:1px 5px;border-radius:3px;color:var(--text)}
+.muted{color:var(--text-dim)}
+.small{font-size:13px}
+.mono{font-family:var(--font-mono);font-size:11.5px;color:var(--text-dim)}
+
+/* Landing hero */
+.hero{display:flex;align-items:center;gap:22px;margin:0 0 8px}
+.hero img{width:84px;height:84px;border-radius:20px;border:1px solid var(--border)}
+
+/* Card grid — auto-fill minmax so it reflows from one column (phone) to
+   two-plus (tablet/desktop) on its own. Never hardcode a column count. */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:13px}
+.ve-card{border:1px solid var(--border);background:var(--surface);padding:15px 17px;border-radius:4px;position:relative}
+.ve-card h3{font-size:15.5px;font-weight:600;margin:0 0 4px}
+.ve-card p{font-size:13.5px;color:var(--text-dim);margin:0}
+
+/* Numbered "how it works" steps */
+.steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:13px;counter-reset:step}
+.step{border:1px solid var(--border);background:var(--surface);padding:15px 17px 16px 17px;border-radius:4px;position:relative}
+.step h3{margin:0 0 4px;font-size:15.5px}
+.step p{font-size:13.5px;color:var(--text-dim);margin:0}
+.step::before{counter-increment:step;content:counter(step);font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--bg);background:var(--gold);width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:9px}
+
+/* Call to action */
+.cta{display:inline-block;font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--bg);background:var(--gold);padding:10px 18px;border-radius:3px;text-decoration:none;margin:6px 14px 6px 0}
+.cta:hover{filter:brightness(1.08)}
+.cta-quiet{display:inline-block;font-family:var(--font-mono);font-size:13px;color:var(--gold);border:1px solid var(--border-strong);padding:9px 18px;border-radius:3px;text-decoration:none;margin:6px 0}
+.cta-quiet:hover{border-color:var(--gold)}
+
+footer.site{margin-top:54px;border-top:1px solid var(--border);padding-top:14px;font-family:var(--font-mono);font-size:11.5px;color:var(--text-dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+footer.site a{color:inherit}
+
+@media (prefers-reduced-motion: no-preference){
+  .ve-card,.step{animation:rise .45s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+}
