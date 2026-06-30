@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy Policy — Cubby</title>
-  <meta name="description" content="Cubby's privacy policy. The short version: your inventory, photos, and tags never leave your device.">
+  <meta name="description" content="Cubby's privacy policy. The short version: your inventory, photos, and tags stay on your device — the only thing that ever leaves is an optional product-barcode look-up you can switch off.">
   <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
   <link rel="apple-touch-icon" href="assets/icon.svg">
   <link rel="stylesheet" href="assets/style.css">
@@ -40,7 +40,9 @@
       <strong>Nothing.</strong> Cubby has no accounts, no sign-in, no
       analytics, no crash-reporting SDK, no advertising identifiers, and no
       third-party SDKs of any kind. The developer receives no data from the
-      app — there is no server for it to be sent to.
+      app — there is no Cubby server for it to be sent to. The one exception is
+      the optional product-barcode look-up described below, which sends only a
+      scanned barcode to a public database — never anything about you.
     </p>
 
     <h2>Where your inventory lives</h2><div class="rule"></div>
@@ -78,22 +80,25 @@
     <h2>Barcodes you capture</h2><div class="rule"></div>
     <p>
       If you scan a product barcode while adding an item, Cubby stores the
-      barcode value locally with that item. It does <strong>not</strong> look
-      the code up in any online database — there is no product lookup and no
-      network request. The barcode is never used as the item's name.
+      barcode value locally with that item. If <strong>product look-up</strong>
+      is on — it is on by default — Cubby sends <em>only that barcode number</em>
+      to a public product database (<code>api.upcitemdb.com</code>) to fetch a
+      suggested name. This is the <strong>single outbound network request</strong>
+      Cubby makes, and it contains nothing but the barcode — no item details, no
+      identifiers, nothing about you. You can switch it off under
+      <strong>Settings → Product lookup</strong> to keep every barcode scan fully
+      on your device. The suggested name is only ever a suggestion you review;
+      the barcode itself is never used as the item's name.
     </p>
 
-    <h2>Optional iCloud sync</h2><div class="rule"></div>
+    <h2>Multi-device sync</h2><div class="rule"></div>
     <p>
-      Cubby can optionally sync your inventory across your own devices using
-      your personal iCloud account. This is <strong>off by default</strong>;
-      it does nothing until you turn it on in Settings. When enabled, your
-      data moves through <em>your</em> iCloud — Apple's encrypted service,
-      governed by Apple's privacy policy — and not through any server
-      belonging to Cubby or its developer. Turn it off and your data stays
-      on the device. If you have iCloud Backup enabled at the system level,
-      your Cubby data may also be included in your encrypted iCloud Backup,
-      which is likewise governed by Apple.
+      Cubby does <strong>not</strong> sync across devices. Your inventory lives on
+      the one device — there is no Cubby account and no Cubby server holding a
+      copy, and no iCloud sync. If you have iCloud Backup enabled at the system
+      level, your Cubby data may be included in your device's standard encrypted
+      iCloud Backup (so it can restore to a new phone), which is governed by
+      Apple — but Cubby itself performs no sync of its own.
     </p>
 
     <h2>On-device processing</h2><div class="rule"></div>
