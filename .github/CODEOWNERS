@@ -1,0 +1,8 @@
+# Code owners for the Cubby companion site (public repo).
+#
+# The repository owner owns everything. Combined with branch protection on
+# `main` (require a pull request + code-owner review), this means any PR from
+# an outside contributor must be approved by the owner before it can merge.
+# The owner retains admin bypass, so direct pushes for routine deploys still work.
+
+* @abhijitbansal

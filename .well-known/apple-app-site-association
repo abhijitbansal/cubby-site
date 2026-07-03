@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["XDTAU7RN57.com.abhijitbansal.Cubby"],
+        "components": [
+          { "/": "/b/*" },
+          { "/": "/r/*" }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy — Cubby</title>
+  <meta name="description" content="Cubby's privacy policy. The short version: your inventory, photos, and tags never leave your device.">
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="apple-touch-icon" href="assets/icon.svg">
+  <link rel="stylesheet" href="assets/style.css">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'none'; form-action 'none'; base-uri 'self'">
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="site">
+    <img src="assets/icon.svg" alt="">
+    <span class="name">Cubby</span>
+    <a href="index.html">Home</a>
+    <a href="privacy.html" aria-current="page">Privacy</a>
+    <a href="support.html">Support</a>
+  </nav>
+
+  <main class="prose">
+    <header class="page">
+      <div class="kicker">Cubby · privacy</div>
+      <h1>What's in your bins is <em>your business</em>.</h1>
+      <p class="lead">
+        Cubby is an inventory app for iPhone and iPad that helps you find
+        things stored in bins. This page describes what data Cubby handles
+        and what it does with it. The short version:
+        <b>your inventory, photos, and tags stay on your device unless you
+        explicitly share them.</b>
+      </p>
+      <p class="mono">Last updated: 28 June 2026</p>
+    </header>
+
+    <h2>What Cubby collects</h2><div class="rule"></div>
+    <p>
+      <strong>Nothing.</strong> Cubby has no accounts, no sign-in, no
+      analytics, no crash-reporting SDK, no advertising identifiers, and no
+      third-party SDKs of any kind. The developer receives no data from the
+      app — there is no server for it to be sent to.
+    </p>
+
+    <h2>Where your inventory lives</h2><div class="rule"></div>
+    <p>
+      Your racks, bins, items, quantities, and activity history are stored
+      in a database on your device. Item photos are saved as files in the
+      app's own storage area. None of this is uploaded or transmitted by
+      Cubby. If you choose to share something — for example a printed label
+      PDF via the iOS share sheet, to Files, AirDrop, Mail, or a printer —
+      that destination's privacy policy governs the file from that point on.
+    </p>
+
+    <h2>Camera access</h2><div class="rule"></div>
+    <p>
+      Cubby requests camera access so you can photograph an item and let the
+      app suggest a name for it. Identification uses Apple's on-device Vision
+      framework: the analysis runs entirely on your device, camera frames are
+      used only while you are adding an item, and no image is uploaded
+      anywhere. The photo you keep with an item is stored locally with that
+      item and nowhere else. Decline camera access and you can still add and
+      name items by hand.
+    </p>
+
+    <h2>NFC and QR tags</h2><div class="rule"></div>
+    <p>
+      Cubby reads and writes NFC tags and reads QR codes on your racks and
+      bins. A tag holds only a link that identifies a bin or rack — for
+      example <code>https://gotcubby.com/b/&lt;id&gt;</code>. <strong>The tag
+      never contains the bin's contents</strong>; the contents are always
+      looked up locally on your device from that identifier. Anyone who taps
+      one of your tags with another phone sees only the link, not what is in
+      the bin. Reading a tag requires no network connection.
+    </p>
+
+    <h2>Barcodes you capture</h2><div class="rule"></div>
+    <p>
+      If you scan a product barcode while adding an item, Cubby stores the
+      barcode value locally with that item. It does <strong>not</strong> look
+      the code up in any online database — there is no product lookup and no
+      network request. The barcode is never used as the item's name.
+    </p>
+
+    <h2>Optional iCloud sync</h2><div class="rule"></div>
+    <p>
+      Cubby can optionally sync your inventory across your own devices using
+      your personal iCloud account. This is <strong>off by default</strong>;
+      it does nothing until you turn it on in Settings. When enabled, your
+      data moves through <em>your</em> iCloud — Apple's encrypted service,
+      governed by Apple's privacy policy — and not through any server
+      belonging to Cubby or its developer. Turn it off and your data stays
+      on the device. If you have iCloud Backup enabled at the system level,
+      your Cubby data may also be included in your encrypted iCloud Backup,
+      which is likewise governed by Apple.
+    </p>
+
+    <h2>On-device processing</h2><div class="rule"></div>
+    <p>
+      Everything Cubby does — storing your inventory, identifying items,
+      generating QR labels, building printable label PDFs, and searching —
+      runs on your device. There is no server-side component and no telemetry.
+    </p>
+
+    <h2>Children</h2><div class="rule"></div>
+    <p>
+      Cubby is rated 4+. It does not collect any information from anyone, so
+      it does not collect information from children either.
+    </p>
+
+    <h2>Changes</h2><div class="rule"></div>
+    <p>
+      If a future version of Cubby changes what data it handles, this policy
+      will be updated and the "Last updated" date revised before that version
+      ships.
+    </p>
+
+    <h2>Contact</h2><div class="rule"></div>
+    <p>
+      Questions about privacy can be sent to
+      <a href="mailto:contact@abhijitbansal.com">contact@abhijitbansal.com</a>.
+    </p>
+  </main>
+
+  <footer class="site">
+    <span><a href="index.html">Home</a> · <a href="support.html">Support</a></span>
+    <span>© 2026 Abhijit Bansal</span>
+  </footer>
+
+</div>
+</body>
+</html>
