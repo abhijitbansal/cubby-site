@@ -8,6 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
   <link rel="apple-touch-icon" href="assets/icon.svg">
   <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/home.css">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'none'; form-action 'none'; base-uri 'self'">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Cubby">
@@ -19,70 +20,433 @@
   <meta name="twitter:title" content="Cubby — find anything in your bins">
 </head>
 <body>
-<div class="wrap">
 
-  <nav class="site">
-    <img src="assets/icon.svg" alt="">
-    <span class="name">Cubby</span>
-    <a href="index.html" aria-current="page">Home</a>
-    <a href="privacy.html">Privacy</a>
-    <a href="support.html">Support</a>
+<svg class="sprite-defs" aria-hidden="true">
+<defs>
+
+<symbol id="i-contactless" viewBox="0 0 24 24">
+  <circle cx="6" cy="18" r="1.3" fill="currentColor" stroke="none"/>
+  <path d="M6,14 A4,4 0 0 1 10,18"/>
+  <path d="M6,10 A8,8 0 0 1 14,18"/>
+  <path d="M6,6 A12,12 0 0 1 18,18"/>
+</symbol>
+
+<symbol id="i-qr" viewBox="0 0 24 24">
+  <rect x="3" y="3" width="6" height="6" rx="1"/>
+  <rect x="5.3" y="5.3" width="1.4" height="1.4" fill="currentColor" stroke="none"/>
+  <rect x="15" y="3" width="6" height="6" rx="1"/>
+  <rect x="17.3" y="5.3" width="1.4" height="1.4" fill="currentColor" stroke="none"/>
+  <rect x="3" y="15" width="6" height="6" rx="1"/>
+  <rect x="5.3" y="17.3" width="1.4" height="1.4" fill="currentColor" stroke="none"/>
+  <rect x="15" y="15" width="2.4" height="2.4" fill="currentColor" stroke="none"/>
+  <rect x="18.6" y="15" width="2.4" height="2.4" fill="currentColor" stroke="none"/>
+  <rect x="15" y="18.6" width="2.4" height="2.4" fill="currentColor" stroke="none"/>
+  <rect x="18.6" y="18.6" width="2.4" height="2.4" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="i-camera" viewBox="0 0 24 24">
+  <path d="M9 5h6l1.5 2H20a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h3.5L9 5z"/>
+  <circle cx="12" cy="13" r="3.4"/>
+</symbol>
+
+<symbol id="i-search" viewBox="0 0 24 24">
+  <circle cx="10.2" cy="10.2" r="6.2"/>
+  <path d="M14.7 14.7 20 20"/>
+</symbol>
+
+<symbol id="i-location-fill" viewBox="0 0 24 24">
+  <path d="M12 21.5s7.2-7.7 7.2-12.7A7.2 7.2 0 0 0 4.8 8.8c0 5 7.2 12.7 7.2 12.7z" fill="currentColor" stroke="none"/>
+  <circle cx="12" cy="9" r="2.5" fill="#fff" stroke="none" opacity=".9"/>
+</symbol>
+
+<symbol id="i-category" viewBox="0 0 24 24">
+  <rect x="3" y="3" width="8" height="8" rx="2"/>
+  <rect x="13" y="3" width="8" height="8" rx="2"/>
+  <rect x="3" y="13" width="8" height="8" rx="2"/>
+  <rect x="13" y="13" width="8" height="8" rx="2"/>
+</symbol>
+
+<symbol id="i-swap" viewBox="0 0 24 24">
+  <path d="M4 8h14M18 8l-4-4M18 8l-4 4"/>
+  <path d="M20 16H6M6 16l4-4M6 16l4 4"/>
+</symbol>
+
+<symbol id="i-inventory" viewBox="0 0 24 24">
+  <rect x="3" y="7" width="18" height="13" rx="1.6"/>
+  <path d="M3 11.2h18"/>
+  <path d="M8.5 7 10 4h4l1.5 3"/>
+</symbol>
+
+<symbol id="i-print" viewBox="0 0 24 24">
+  <rect x="4" y="8.5" width="16" height="8" rx="1.6"/>
+  <path d="M6.5 8.5V4h11v4.5"/>
+  <rect x="7.5" y="14" width="9" height="6" rx="1"/>
+</symbol>
+
+<symbol id="i-sell" viewBox="0 0 24 24">
+  <path d="M3 11.1V5.5a2 2 0 0 1 2-2h5.6a2 2 0 0 1 1.42.59l8 8a2 2 0 0 1 0 2.82l-6.6 6.6a2 2 0 0 1-2.82 0l-8-8A2 2 0 0 1 3 11.1Z"/>
+  <circle cx="7.6" cy="7.6" r="1.35" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="i-add-photo" viewBox="0 0 24 24">
+  <path d="M3 8h3.4L7.8 6h4.4l1.4 2H19a1 1 0 0 1 1 1v8.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
+  <circle cx="10" cy="13.5" r="3"/>
+  <path d="M19 3v6M16 6h6"/>
+</symbol>
+
+<symbol id="i-near-me" viewBox="0 0 24 24">
+  <path d="M3 11 20 3l-8 17-2-7-7-2z" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-lock" viewBox="0 0 24 24">
+  <path d="M7 10.5V7.8a5 5 0 0 1 10 0v2.7"/>
+  <rect x="5" y="10.5" width="14" height="10" rx="2.2"/>
+  <path d="M12 14.3v2.6"/>
+</symbol>
+
+<symbol id="i-cloud-off" viewBox="0 0 24 24">
+  <path d="M7.2 17.5h9.3a4 4 0 0 0 .4-7.98A5.5 5.5 0 0 0 7.7 8.4a4.2 4.2 0 0 0-1.4.3"/>
+  <path d="M3.5 3.5l17 17"/>
+</symbol>
+
+<symbol id="i-arrow-forward" viewBox="0 0 24 24">
+  <path d="M4 12h14"/>
+  <path d="M13 6l6 6-6 6"/>
+</symbol>
+
+<symbol id="i-drag" viewBox="0 0 24 24">
+  <circle cx="9" cy="7" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="15" cy="7" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="9" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="15" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="9" cy="17" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="15" cy="17" r="1.3" fill="currentColor" stroke="none"/>
+</symbol>
+
+</defs>
+</svg>
+
+<div class="home" id="top">
+
+  <nav class="home-nav">
+    <a class="brand" href="#top">
+      <img src="assets/icon.svg" alt="">
+      <span class="name">Cubby</span>
+    </a>
+    <div class="links">
+      <a href="#features">What it does</a>
+      <a href="#how">How it works</a>
+      <a href="privacy.html">Privacy</a>
+      <a class="cta-pill" href="#download">Get the app</a>
+    </div>
   </nav>
 
-  <main>
-    <header class="page">
-      <div class="kicker">Cubby · for iPhone &amp; iPad</div>
-      <h1>Tap a bin.<br>See <em>what's inside</em>.</h1>
-      <p class="lead">Your basement is full of identical tubs. Cubby puts an NFC tag and a QR label on every rack and bin, so one tap shows the contents — <b>private, fully on-device, no accounts, no cloud.</b></p>
-    </header>
+  <section class="home-hero" id="hero">
+    <div class="hero-poster" aria-hidden="true">
+      <div class="hero-poster-grid">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span class="gold"></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="hero-scrim-x" aria-hidden="true"></div>
+    <div class="hero-scrim-y" aria-hidden="true"></div>
 
-    <p>
-      <a class="cta" href="support.html">How it works →</a>
-      <a class="cta-quiet" href="privacy.html">Read the privacy promise</a>
-    </p>
-
-    <figure class="demo">
-      <img src="assets/demo/tour.gif" width="380" height="826" alt="A tour of Cubby: the home screen, collections, finding an item on a rack map, on-loan tracking, low-stock alerts, and the monthly recap." loading="lazy">
-      <figcaption>From find, to organize, to lend &amp; restock — captured in the app.</figcaption>
-    </figure>
-
-    <h2>What it does</h2><div class="rule"></div>
-    <div class="grid">
-      <div class="ve-card"><h3>Tap to open a bin</h3><p>Hold your iPhone to a tub's NFC tag and Cubby opens straight to its contents — even from the lock screen, with the app closed.</p></div>
-      <div class="ve-card"><h3>Scan the QR too</h3><p>No NFC, or hands full on iPad? The printed QR label and a short human code (<code>BIN-12</code>) get you to the same place.</p></div>
-      <div class="ve-card"><h3>Add items by camera</h3><p>Point the camera at an item and on-device Vision suggests a name. A sharpness check rejects blurry shots before they're saved.</p></div>
-      <div class="ve-card"><h3>Scan things in and out</h3><p>Open a bin, then add, remove, or move items. Quantities update as you go and every change is logged to an activity feed.</p></div>
-      <div class="ve-card"><h3>Search across everything</h3><p>One search field spans item names, notes, bins, and racks — find the holiday lights without opening a single lid.</p></div>
-      <div class="ve-card"><h3>Print your own labels</h3><p>Lay out QR labels for whole racks at once and print to an Avery sheet or a roll printer over AirPrint. Tag once, find forever.</p></div>
-      <div class="ve-card"><h3>Where is it? <span class="mono">new</span></h3><p>From a search hit, see the bin's spot on a rack map — then tap its tag to confirm you're standing at the right one.</p></div>
-      <div class="ve-card"><h3>Collections &amp; smart filters <span class="mono">new</span></h3><p>Group items into Collections that span bins, tag them, and narrow with filters: category, location, in-stock, has-a-photo.</p></div>
-      <div class="ve-card"><h3>Lend it, get it back <span class="mono">new</span></h3><p>Mark a tool as lent with a due date and get a reminder to chase it. See what's out, what's overdue, and what you borrowed.</p></div>
-      <div class="ve-card"><h3>Never run out <span class="mono">new</span></h3><p>Set a par level on consumables. "Running low" shows what's below par and how many more you need — then share a shopping note.</p></div>
-      <div class="ve-card"><h3>A full timeline <span class="mono">new</span></h3><p>Every add, move, lend, and scan is logged — a house-wide activity feed, a per-item history, and a monthly recap.</p></div>
-      <div class="ve-card"><h3>Private by architecture</h3><p>No account to create, nothing uploaded, no analytics. Your inventory lives on your device. Optional sync uses your own iCloud.</p></div>
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <div class="hero-badge">
+          <span class="dot" aria-hidden="true"></span>HOME INVENTORY · PRIVATE BY DESIGN
+        </div>
+        <h1>Tap a bin.<br>See <em>what's&nbsp;inside</em>.</h1>
+        <p class="hero-sub">Your basement is full of identical tubs. Cubby puts an NFC tag and a QR label on every rack and bin — so one tap shows the contents. Fully on-device. No accounts, no cloud, no tracking.</p>
+        <div class="hero-ctas">
+          <div class="cta-inert">
+            <button type="button" class="btn-store" disabled aria-label="Download on the App Store — coming soon">
+              <svg class="glyph" width="21" height="25" viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+              <span class="lines"><span class="line-small">Download on the</span><span class="line-big">App Store</span></span>
+            </button>
+            <span class="coming-soon-tag">Coming soon — not yet on the App Store</span>
+          </div>
+          <a class="btn-ghost" href="#how">See how it works <svg class="icon" aria-hidden="true"><use href="#i-arrow-forward"></use></svg></a>
+        </div>
+        <div class="hero-meta">iPHONE &amp; IPAD · iOS 26 · COMING SOON TO THE APP STORE</div>
+      </div>
     </div>
 
-    <h2>How it works</h2><div class="rule"></div>
-    <div class="steps">
-      <div class="step"><h3>Tag your racks &amp; bins</h3><p>Stick an NFC tag and a printed QR label on each rack and tub. Cubby writes the tag for you in one tap.</p></div>
-      <div class="step"><h3>Fill them in</h3><p>Open a bin in the app and add what's inside — snap a photo, accept or edit the suggested name, set a quantity.</p></div>
-      <div class="step"><h3>Find it later</h3><p>Tap a tag, scan a QR, or search by name. Cubby tells you which bin on which rack — no more digging through every lid.</p></div>
+    <div class="hero-tag" aria-hidden="true">
+      <div class="hero-tag-card">
+        <svg class="icon" aria-hidden="true"><use href="#i-location-fill"></use></svg>
+        <div>
+          <div class="hero-tag-title">Cordless Drill<span class="hero-tag-found">✓ FOUND</span></div>
+          <div class="hero-tag-meta">RACK-A · SHELF 2 · BIN-12</div>
+        </div>
+      </div>
+      <div class="hero-tag-wire"></div>
     </div>
 
-    <p style="margin-top:28px">
-      <strong>Requirements:</strong> iPhone or iPad running iOS 26 or later. Tap-to-open uses NFC
-      (iPhone); QR scanning and short codes work everywhere, including iPad.
-    </p>
+    <div class="hero-scroll-cue" aria-hidden="true"><span></span></div>
+  </section>
 
-    <p class="muted small">
-      Coming soon to the App Store.
-    </p>
-  </main>
+  <div class="marquee">
+    <div class="marquee-track">
+      <div class="marquee-set">
+        <span class="word">TAP TO OPEN</span><span class="dot">◆</span><span class="word">SCAN THE QR</span><span class="dot">◆</span><span class="word">BIN-12</span><span class="dot">◆</span><span class="word">RACK-A</span><span class="dot">◆</span><span class="word">FIND IN SECONDS</span><span class="dot">◆</span><span class="word">ON-DEVICE</span><span class="dot">◆</span><span class="word">NO CLOUD</span><span class="dot">◆</span><span class="word">PRINT YOUR LABELS</span><span class="dot">◆</span><span class="word">PRIVATE BY DESIGN</span><span class="dot">◆</span>
+      </div>
+      <div class="marquee-set" aria-hidden="true">
+        <span class="word">TAP TO OPEN</span><span class="dot">◆</span><span class="word">SCAN THE QR</span><span class="dot">◆</span><span class="word">BIN-12</span><span class="dot">◆</span><span class="word">RACK-A</span><span class="dot">◆</span><span class="word">FIND IN SECONDS</span><span class="dot">◆</span><span class="word">ON-DEVICE</span><span class="dot">◆</span><span class="word">NO CLOUD</span><span class="dot">◆</span><span class="word">PRINT YOUR LABELS</span><span class="dot">◆</span><span class="word">PRIVATE BY DESIGN</span><span class="dot">◆</span>
+      </div>
+    </div>
+  </div>
 
-  <footer class="site">
-    <span><a href="privacy.html">Privacy</a> · <a href="support.html">Support</a></span>
-    <span>© 2026 Abhijit Bansal</span>
-  </footer>
+  <section class="features" id="features">
+    <div class="container">
+      <div class="features-head">
+        <div class="eyebrow">WHAT IT DOES</div>
+        <div class="section-head"><h2>Everything in the basement,<br><em>findable.</em></h2></div>
+        <p class="section-intro">One app, tags on your tubs, and the entire contents of your storage — searchable in a second. Here's what Cubby does the moment you tap.</p>
+      </div>
+
+      <div class="features-grid">
+
+        <div class="card card--navy">
+          <div class="card-pulse" aria-hidden="true"><span></span><span></span></div>
+          <div class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-contactless"></use></svg></div>
+          <h3>Tap to open a bin</h3>
+          <p>Hold your iPhone to a tub's NFC tag and Cubby opens straight to its contents — even from the lock screen, with the app closed.</p>
+        </div>
+
+        <div class="card">
+          <div class="icon-tile icon-tile--slate"><svg class="icon" aria-hidden="true"><use href="#i-qr"></use></svg></div>
+          <h3>Scan the QR too</h3>
+          <p>No NFC, or hands full on iPad? The printed QR label and a short human code (<code>BIN-12</code>) get you to the same place.</p>
+        </div>
+
+        <div class="card">
+          <div class="icon-tile icon-tile--sage"><svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg></div>
+          <h3>Add items by camera</h3>
+          <p>Point the camera and on-device Vision suggests a name. A sharpness check rejects blurry shots before they're saved.</p>
+        </div>
+
+        <div class="card">
+          <div class="icon-tile icon-tile--slate"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg></div>
+          <h3>Search your whole house</h3>
+          <p>One field spans item names, notes, bins, and racks — find the holiday lights without opening a single lid.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="icon-tile icon-tile--gold"><svg class="icon" aria-hidden="true"><use href="#i-location-fill"></use></svg></div>
+            <span class="pill-new">NEW</span>
+          </div>
+          <h3>Where is it?</h3>
+          <p>See the bin's spot on a rack map, then tap its tag to confirm you're standing at the right one.</p>
+          <div class="rack-map" aria-hidden="true">
+            <div class="rack-map-cell">11</div>
+            <div class="rack-map-cell">10</div>
+            <div class="rack-map-cell">09</div>
+            <div class="rack-map-cell">08</div>
+            <div class="rack-map-cell">07</div>
+            <div class="rack-map-cell rack-map-cell--gold"><svg class="icon" aria-hidden="true"><use href="#i-location-fill"></use></svg></div>
+            <div class="rack-map-cell">05</div>
+            <div class="rack-map-cell">04</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="icon-tile icon-tile--slate"><svg class="icon" aria-hidden="true"><use href="#i-category"></use></svg></div>
+            <span class="pill-new">NEW</span>
+          </div>
+          <h3>Collections &amp; filters</h3>
+          <p>Group items into Collections that span bins, tag them, and narrow by category, location, in-stock, or has-a-photo.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="icon-tile icon-tile--rose"><svg class="icon" aria-hidden="true"><use href="#i-swap"></use></svg></div>
+            <span class="pill-new">NEW</span>
+          </div>
+          <h3>Lend it, get it back</h3>
+          <p>Mark a tool lent with a due date and get a reminder to chase it. See what's out, what's overdue, and what you borrowed.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="icon-tile icon-tile--gold"><svg class="icon" aria-hidden="true"><use href="#i-inventory"></use></svg></div>
+            <span class="pill-new">NEW</span>
+          </div>
+          <h3>Never run out</h3>
+          <p>Set a par level on consumables. "Running low" shows what's below par and exactly how many more you need.</p>
+        </div>
+
+        <div class="card">
+          <div class="icon-tile icon-tile--slate"><svg class="icon" aria-hidden="true"><use href="#i-print"></use></svg></div>
+          <h3>Print your own labels</h3>
+          <p>Lay out QR labels for whole racks at once and print to an Avery sheet or a roll printer over AirPrint. Tag once, find forever.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="how" id="how">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">HOW IT WORKS</div>
+        <h2>Tag it once.<br><em>Find it forever.</em></h2>
+      </div>
+      <div class="how-steps">
+        <div class="how-step">
+          <div class="how-step-tile">
+            <svg class="icon icon-navy" aria-hidden="true"><use href="#i-sell"></use></svg>
+            <span class="how-step-num">1</span>
+          </div>
+          <h3>Tag your racks &amp; bins</h3>
+          <p>Stick an NFC tag and a printed QR label on each rack and tub. Cubby writes the tag for you in one tap.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-step-tile">
+            <svg class="icon icon-sage" aria-hidden="true"><use href="#i-add-photo"></use></svg>
+            <span class="how-step-num">2</span>
+          </div>
+          <h3>Fill them in</h3>
+          <p>Open a bin and add what's inside — snap a photo, accept or edit the suggested name, set a quantity.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-step-tile">
+            <svg class="icon icon-gold" aria-hidden="true"><use href="#i-near-me"></use></svg>
+            <span class="how-step-num">3</span>
+          </div>
+          <h3>Find it later</h3>
+          <p>Tap a tag, scan a QR, or search by name. Cubby tells you which bin on which rack — no more digging.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screens" id="screens">
+    <div class="container">
+      <div class="screens-head">
+        <div class="section-head">
+          <div class="eyebrow">EVERY SCREEN</div>
+          <h2>The whole house,<br><em>in your pocket.</em></h2>
+        </div>
+        <p>Straight from the App Store — calm, legible, and built for one-handed use in a dim garage. Drag to browse.</p>
+      </div>
+    </div>
+    <div class="screens-rail">
+      <div class="screens-rail-track">
+        <figure><img src="assets/screens/01-hero.jpg" alt="Cubby home — find what you stashed" loading="lazy" width="302" height="655"></figure>
+        <figure><img src="assets/screens/02-tap.jpg" alt="Tap an NFC tag to open a bin" loading="lazy" width="302" height="655"></figure>
+        <figure><img src="assets/screens/03-capture.jpg" alt="Add items with the camera" loading="lazy" width="302" height="655"></figure>
+        <figure><img src="assets/screens/04-labels.jpg" alt="Print your own QR labels" loading="lazy" width="302" height="655"></figure>
+        <figure><img src="assets/screens/05-where.jpg" alt="Where is it — rack map locate" loading="lazy" width="302" height="655"></figure>
+        <figure><img src="assets/screens/06-privacy.jpg" alt="Private by architecture" loading="lazy" width="302" height="655"></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="motion" id="motion">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">SEE IT IN MOTION</div>
+        <h2>From find, to organize,<br><em>to lend &amp; restock.</em></h2>
+        <p class="section-intro">Demo clips are on the way. This row is a placeholder for real screen recordings of finding, organizing, lending, and restocking — no video yet.</p>
+      </div>
+      <div class="motion-row">
+        <div class="motion-phone">
+          <div class="motion-phone-frame">
+            <div class="motion-phone-notch" aria-hidden="true"></div>
+            <div class="motion-phone-screen">
+              <svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg>
+              <span class="motion-phone-screen-label">Placeholder<br>demo coming soon</span>
+            </div>
+          </div>
+          <div class="motion-phone-caption">FIND &amp; LOCATE</div>
+        </div>
+        <div class="motion-phone motion-phone--lg">
+          <div class="motion-phone-frame">
+            <div class="motion-phone-notch" aria-hidden="true"></div>
+            <div class="motion-phone-screen">
+              <svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg>
+              <span class="motion-phone-screen-label">Placeholder<br>demo coming soon</span>
+            </div>
+          </div>
+          <div class="motion-phone-caption">THE FULL TOUR</div>
+        </div>
+        <div class="motion-phone">
+          <div class="motion-phone-frame">
+            <div class="motion-phone-notch" aria-hidden="true"></div>
+            <div class="motion-phone-screen">
+              <svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg>
+              <span class="motion-phone-screen-label">Placeholder<br>demo coming soon</span>
+            </div>
+          </div>
+          <div class="motion-phone-caption">LEND &amp; RESTOCK</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="private" id="private">
+    <div class="container">
+      <div class="eyebrow">PRIVATE BY ARCHITECTURE</div>
+      <h2>Your home's contents are nobody's business but yours.</h2>
+      <p class="section-intro">Cubby processes everything — naming, search, labels — on your device. No accounts, no cloud backend, no analytics. NFC and QR tags hold only a random identifier, never your item names.</p>
+      <div class="private-cards">
+        <div class="private-card">
+          <svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg>
+          <h3>No account to create</h3>
+          <p>Open the app and start. Nothing is uploaded, and there's nobody to sign up with.</p>
+        </div>
+        <div class="private-card">
+          <svg class="icon" aria-hidden="true"><use href="#i-sell"></use></svg>
+          <h3>Tags hold only an ID</h3>
+          <p>A scanned tag reveals nothing on its own — the contents live only in your copy of Cubby.</p>
+        </div>
+        <div class="private-card">
+          <svg class="icon" aria-hidden="true"><use href="#i-cloud-off"></use></svg>
+          <h3>iCloud sync, off by default</h3>
+          <p>Optional sync uses your own iCloud, under Apple's privacy policy — and only if you turn it on.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="download" id="download">
+    <div class="download-panel">
+      <img class="download-mark" src="assets/icon.svg" alt="Cubby app icon">
+      <h2>Coming soon to<br>the App Store.</h2>
+      <p class="lede">One tap to find anything you've stored. Be first in line when Cubby lands.</p>
+      <div class="download-ctas">
+        <div class="cta-inert">
+          <button type="button" class="btn-store" disabled aria-label="Download on the App Store — coming soon">
+            <svg class="glyph" width="22" height="26" viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+            <span class="lines"><span class="line-small">Download on the</span><span class="line-big">App Store</span></span>
+          </button>
+          <span class="coming-soon-tag">Coming soon</span>
+        </div>
+        <div class="cta-inert">
+          <button type="button" class="btn-ghost" disabled aria-label="Join the beta — coming soon">Join the beta</button>
+          <span class="coming-soon-tag">Coming soon</span>
+        </div>
+      </div>
+      <div class="download-req">iPHONE OR IPAD · iOS 26 OR LATER · TAP-TO-OPEN NEEDS NFC</div>
+    </div>
+
+    <footer class="home-footer">
+      <a class="brand" href="#top">
+        <img src="assets/icon.svg" alt="">
+        <span class="name">Cubby</span>
+      </a>
+      <div class="links">
+        <a href="index.html">Home</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="support.html">Support</a>
+      </div>
+      <div class="copyright">© 2026 Abhijit Bansal · Made for iOS 26</div>
+    </footer>
+  </section>
 
 </div>
 </body>
