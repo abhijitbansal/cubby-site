@@ -164,10 +164,12 @@
   .home .hero-badge,.home .home-hero h1,.home .home-hero .hero-sub,.home .hero-ctas,.home .hero-meta{animation:none;opacity:1;transform:none}
 }
 
-/* the floating "found" tag — repositioned every frame by hero-scene.js via
-   a CSS transform from a (0,0) anchor; do not give it a static top/right
-   here or the two positioning systems will fight. */
-.home .hero-tag{position:absolute;top:0;left:0;z-index:4;display:flex;flex-direction:column;align-items:center;pointer-events:none;opacity:0;will-change:transform;transition:opacity .5s ease}
+/* the floating "found" tag. Default state below is the no-JS/WebGL-failed
+   fallback: visible, near the poster's gold cell. hero-scene.js resets
+   top/left to 0 once the scene builds successfully and takes over from
+   there via a per-frame transform from that (0,0) anchor — the two
+   positioning systems never run at the same time, so they don't fight. */
+.home .hero-tag{position:absolute;top:32%;left:66%;z-index:4;display:flex;flex-direction:column;align-items:center;pointer-events:none;opacity:1;transform:translate(-50%,-100%);will-change:transform;transition:opacity .5s ease}
 .home .hero-tag-card{display:flex;align-items:center;gap:11px;background:rgba(255,253,249,.98);border:1px solid rgba(217,169,63,.55);border-radius:13px;padding:9px 14px;box-shadow:0 18px 40px rgba(5,11,22,.55)}
 .home .hero-tag-card .icon{color:var(--home-gold);width:22px;height:22px}
 .home .hero-tag-title{font:600 13px/1.1 var(--home-font-body);color:var(--ink)}

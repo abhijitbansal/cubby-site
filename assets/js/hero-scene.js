@@ -55,7 +55,7 @@
     if ('outputEncoding' in renderer) renderer.outputEncoding = T.sRGBEncoding;
     renderer.toneMapping = T.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.12;
-    renderer.domElement.style.cssText = 'display:block;width:100%;height:100%;cursor:grab';
+    renderer.domElement.style.cssText = 'display:block;width:100%;height:100%;cursor:grab;touch-action:pan-y';
     mount.appendChild(renderer.domElement);
 
     scene.add(new T.HemisphereLight(0x9fb8e0, 0x0a1220, 0.6));
@@ -253,8 +253,8 @@
     if (state.userRotY > 0.7) state.userRotY = 0.7;
     if (state.userRotY < -0.7) state.userRotY = -0.7;
 
-    world.rotation.y = sway + state.userRotY + state.px * 0.2;
-    world.rotation.x = -0.03 + state.py * 0.09;
+    world.rotation.y = sway + state.userRotY + (reduce ? 0 : state.px * 0.2);
+    world.rotation.x = -0.03 + (reduce ? 0 : state.py * 0.09);
 
     if (goldGroup) goldGroup.position.y = goldBaseY + (reduce ? 0 : Math.sin(t * 1.5) * 0.06);
     if (goldMat) goldMat.emissiveIntensity = reduce ? 1.0 : (0.85 + Math.sin(t * 2.1) * 0.28);
@@ -321,9 +321,6 @@
     renderer.domElement.style.cursor = 'grabbing';
   }
   function onPointerMove(e) {
-    var r = heroEl.getBoundingClientRect();
-    state.tpx = ((e.clientX - r.left) / r.width) * 2 - 1;
-    state.tpy = ((e.clientY - r.top) / r.height) * 2 - 1;
     if (state.dragging) {
       var dx = e.clientX - state._lastX;
       state._lastX = e.clientX;
@@ -331,7 +328,22 @@
       state.userRotY += d;
       state.velY = d * 0.4;
     }
+    // Parallax target: only tracked while the hero is on-screen and motion
+    // isn't reduced (skips a layout read the rest of the time), and clamped
+    // so a target set just before scrolling away can't leave [-1,1] and
+    // cause a visible "swing" when the hero re-enters view.
+    if (heroVisible && !state.reduce) {
+      var r = heroEl.getBoundingClientRect();
+      state.tpx = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width) * 2 - 1));
+      state.tpy = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height) * 2 - 1));
+    }
     renderOnceIfIdle();
+  }
+  function onPointerCancel() {
+    // A touch-scroll past the hero delivers pointercancel, not pointerup —
+    // without handling it, state.dragging gets stuck true forever, which
+    // permanently disables the inertia decay in renderFrame().
+    onPointerUp();
   }
   function onPointerUp() {
     state.dragging = false;
@@ -364,13 +376,19 @@
     buildScene();
   } catch (e) {
     console.warn('Cubby hero: Three.js scene failed to initialize, falling back to CSS poster.', e);
-    if (tagEl) tagEl.style.display = 'none';
+    // Leave tagEl at its CSS default (static, visible) rather than hiding it —
+    // that default IS the no-WebGL fallback.
     return;
   }
+
+  // Scene built successfully: hand the tag off from its static CSS default
+  // to hero-scene.js's per-frame transform, which assumes a (0,0) anchor.
+  if (tagEl) { tagEl.style.top = '0'; tagEl.style.left = '0'; }
 
   renderer.domElement.addEventListener('pointerdown', onPointerDown);
   window.addEventListener('pointermove', onPointerMove, { passive: true });
   window.addEventListener('pointerup', onPointerUp, { passive: true });
+  window.addEventListener('pointercancel', onPointerCancel, { passive: true });
   window.addEventListener('resize', onResize);
   if (reduceMQ && reduceMQ.addEventListener) reduceMQ.addEventListener('change', onReduceChange);
 
