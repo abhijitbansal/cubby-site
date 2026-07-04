@@ -113,8 +113,12 @@
 .home .icon-tile--rose{background:#F5EAEC;color:var(--home-rose)}
 
 /* ---------- nav ---------- */
-.home .home-nav{position:fixed;top:0;left:0;width:100%;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:15px clamp(20px,5vw,64px);background:rgba(9,17,33,.62);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid rgba(255,255,255,.08);margin:0}
-.home .home-nav .brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:#EAF0F8}
+/* Base state = transparent/light-text over the hero. nav.js toggles
+   .is-solid past ~0.72x viewport scroll (paper bar, blur, dark text) and
+   sets [data-nav]/[data-nav-dim] link colors to match — see assets/js/nav.js. */
+.home .home-nav{position:fixed;top:0;left:0;width:100%;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:15px clamp(20px,5vw,64px);background:rgba(9,17,33,0);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);border-bottom:1px solid rgba(255,255,255,0);transition:background .45s ease,box-shadow .45s ease,border-color .45s ease;margin:0}
+.home .home-nav.is-solid{background:rgba(246,244,239,.82);backdrop-filter:saturate(1.5) blur(16px);-webkit-backdrop-filter:saturate(1.5) blur(16px);border-bottom-color:var(--hairline);box-shadow:0 6px 22px rgba(28,36,56,.06)}
+.home .home-nav .brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:#EAF0F8;transition:color .3s ease}
 .home .home-nav .brand img{width:28px;height:28px;border-radius:8px;flex:none}
 .home .home-nav .brand .name{font-family:var(--home-font-display);font-weight:600;font-size:19px;margin:0}
 .home .home-nav .links{display:flex;align-items:center;gap:clamp(14px,2.4vw,30px)}
@@ -124,35 +128,55 @@
 .home .home-nav .links .cta-pill:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(184,134,11,.44)}
 
 /* ---------- hero (named .home-hero — .hero was already taken in style.css) ---------- */
-.home .home-hero{position:relative;min-height:100vh;overflow:hidden;background:radial-gradient(125% 95% at 68% 38%,var(--hero-1) 0%,var(--hero-2) 52%,var(--hero-3) 100%);display:flex;align-items:center;margin:0;padding-block:0;gap:0}
+.home .home-hero{position:relative;min-height:100vh;overflow:hidden;background:radial-gradient(125% 95% at 68% 38%,var(--hero-1) 0%,var(--hero-2) 52%,var(--hero-3) 100%);display:flex;align-items:center;margin:0;padding-block:0;gap:0;cursor:grab}
 
-/* the CSS-only fallback poster: this IS the hero background for this pass —
-   no <canvas>, no Three.js yet. A blurred perspective grid, one gold cell. */
+/* the CSS-only fallback poster: stays in the DOM behind the canvas so the
+   hero still reads if WebGL is unavailable or before hero-scene.js mounts.
+   A blurred perspective grid, one gold cell. */
 .home .hero-poster{position:absolute;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.28;filter:blur(2px)}
 .home .hero-poster-grid{display:grid;grid-template-columns:repeat(4,58px);grid-template-rows:repeat(3,44px);gap:14px;transform:perspective(900px) rotateX(6deg) rotateY(-14deg)}
 .home .hero-poster-grid span{background:rgba(157,180,214,.16);border-radius:7px}
 .home .hero-poster-grid span.gold{background:rgba(217,169,63,.55);box-shadow:0 0 30px rgba(217,169,63,.6)}
 
-.home .hero-scrim-x{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(96deg,rgba(9,17,33,.94) 0%,rgba(9,17,33,.78) 30%,rgba(9,17,33,.32) 52%,rgba(9,17,33,0) 72%)}
-.home .hero-scrim-y{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(9,17,33,.55) 0%,rgba(9,17,33,0) 22%,rgba(9,17,33,0) 68%,rgba(9,17,33,.7) 100%)}
+/* Three.js mount — hero-scene.js appends its <canvas> here. Sits above the
+   CSS poster, below the text scrims, so the WebGL wall reads through the
+   dark gradient exactly like the poster did. */
+.home .hero-scene{position:absolute;inset:0;z-index:1}
 
-.home .hero-inner{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding-inline:clamp(20px,5vw,64px);width:100%}
+.home .hero-scrim-x{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(96deg,rgba(9,17,33,.94) 0%,rgba(9,17,33,.78) 30%,rgba(9,17,33,.32) 52%,rgba(9,17,33,0) 72%)}
+.home .hero-scrim-y{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(9,17,33,.55) 0%,rgba(9,17,33,0) 22%,rgba(9,17,33,0) 68%,rgba(9,17,33,.7) 100%)}
+
+/* pointer-events:none on the text column lets pointer drags reach the canvas
+   underneath everywhere except the actual interactive controls (auto below) */
+.home .hero-inner{position:relative;z-index:3;max-width:1240px;margin:0 auto;padding-inline:clamp(20px,5vw,64px);width:100%;pointer-events:none}
 .home .hero-copy{max-width:640px}
-.home .hero-badge{display:inline-flex;align-items:center;gap:9px;font:600 12px/1 var(--home-font-mono);letter-spacing:.22em;color:var(--gold-web);background:rgba(217,169,63,.1);border:1px solid rgba(217,169,63,.28);padding:8px 13px;border-radius:999px}
+.home .hero-badge{display:inline-flex;align-items:center;gap:9px;font:600 12px/1 var(--home-font-mono);letter-spacing:.22em;color:var(--gold-web);background:rgba(217,169,63,.1);border:1px solid rgba(217,169,63,.28);padding:8px 13px;border-radius:999px;opacity:0;animation:cbHeroIn .9s cubic-bezier(.2,.7,.2,1) .15s forwards}
 .home .hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--home-sage);box-shadow:0 0 10px var(--home-sage)}
-.home .home-hero h1{font-family:var(--home-font-display);font-weight:600;font-size:clamp(46px,7.4vw,96px);line-height:.96;letter-spacing:-.025em;color:#F5F1E8;margin:22px 0 0;text-wrap:balance}
+.home .home-hero h1{font-family:var(--home-font-display);font-weight:600;font-size:clamp(46px,7.4vw,96px);line-height:.96;letter-spacing:-.025em;color:#F5F1E8;margin:22px 0 0;text-wrap:balance;opacity:0;animation:cbHeroIn 1s cubic-bezier(.2,.7,.2,1) .28s forwards}
 .home .home-hero h1 em{font-style:italic;color:var(--gold-web)}
-.home .home-hero .hero-sub{font:400 clamp(16px,1.5vw,19px)/1.6 var(--home-font-body);color:rgba(226,233,245,.82);margin-top:24px;max-width:498px}
-.home .hero-ctas{display:flex;flex-wrap:wrap;align-items:flex-start;gap:14px;margin-top:34px}
-.home .hero-meta{margin-top:24px;font:500 12px/1.4 var(--home-font-mono);letter-spacing:.18em;color:rgba(180,196,222,.62)}
+.home .home-hero .hero-sub{font:400 clamp(16px,1.5vw,19px)/1.6 var(--home-font-body);color:rgba(226,233,245,.82);margin-top:24px;max-width:498px;opacity:0;animation:cbHeroIn 1s cubic-bezier(.2,.7,.2,1) .42s forwards}
+.home .hero-ctas{display:flex;flex-wrap:wrap;align-items:flex-start;gap:14px;margin-top:34px;opacity:0;animation:cbHeroIn 1s cubic-bezier(.2,.7,.2,1) .56s forwards}
+.home .hero-ctas .cta-inert,.home .hero-ctas .btn-ghost{pointer-events:auto}
+.home .hero-meta{margin-top:24px;font:500 12px/1.4 var(--home-font-mono);letter-spacing:.18em;color:rgba(180,196,222,.62);opacity:0;animation:cbHeroIn 1s cubic-bezier(.2,.7,.2,1) .7s forwards}
 
-.home .hero-tag{position:absolute;z-index:3;top:30%;right:12%;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+@keyframes cbHeroIn{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .home .hero-badge,.home .home-hero h1,.home .home-hero .hero-sub,.home .hero-ctas,.home .hero-meta{animation:none;opacity:1;transform:none}
+}
+
+/* the floating "found" tag — repositioned every frame by hero-scene.js via
+   a CSS transform from a (0,0) anchor; do not give it a static top/right
+   here or the two positioning systems will fight. */
+.home .hero-tag{position:absolute;top:0;left:0;z-index:4;display:flex;flex-direction:column;align-items:center;pointer-events:none;opacity:0;will-change:transform;transition:opacity .5s ease}
 .home .hero-tag-card{display:flex;align-items:center;gap:11px;background:rgba(255,253,249,.98);border:1px solid rgba(217,169,63,.55);border-radius:13px;padding:9px 14px;box-shadow:0 18px 40px rgba(5,11,22,.55)}
 .home .hero-tag-card .icon{color:var(--home-gold);width:22px;height:22px}
 .home .hero-tag-title{font:600 13px/1.1 var(--home-font-body);color:var(--ink)}
 .home .hero-tag-found{color:var(--home-sage);font-weight:700;font-size:11px;margin-left:6px}
 .home .hero-tag-meta{font:500 11px/1.3 var(--home-font-mono);color:var(--ink-dim);margin-top:3px;letter-spacing:.18em}
 .home .hero-tag-wire{width:1px;height:28px;background:linear-gradient(var(--gold-bright),rgba(217,169,63,0))}
+
+.home .hero-drag-hint{position:absolute;right:clamp(20px,5vw,54px);bottom:34px;z-index:3;pointer-events:none;display:flex;align-items:center;gap:10px;font:500 11px/1 var(--home-font-mono);letter-spacing:.18em;color:rgba(214,224,240,.55)}
+.home .hero-drag-hint .icon{width:17px;height:17px;color:rgba(230,184,75,.85)}
 
 .home .hero-scroll-cue{position:absolute;left:50%;bottom:26px;z-index:2;transform:translateX(-50%);width:23px;height:37px;border:1.5px solid rgba(214,224,240,.4);border-radius:12px;display:flex;justify-content:center;padding-top:7px}
 .home .hero-scroll-cue span{width:3px;height:7px;border-radius:2px;background:rgba(230,184,75,.9);animation:cbScrollDot 1.8s ease-in-out infinite}
@@ -219,10 +243,13 @@
 .home .motion-phone--lg .motion-phone-frame{width:250px;border-radius:42px;padding:10px;box-shadow:0 30px 60px rgba(13,21,36,.36)}
 .home .motion-phone-notch{position:absolute;top:16px;left:50%;transform:translateX(-50%);width:52px;height:6px;border-radius:6px;background:#26303f;z-index:2}
 .home .motion-phone--lg .motion-phone-notch{top:18px;width:60px;height:7px}
-.home .motion-phone-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:194px;height:420px;border-radius:28px;background:linear-gradient(165deg,#16213570,#0d152470);border:1px dashed rgba(234,240,248,.22)}
+/* the screen is a real <video> (poster only, no <source> yet — see README
+   "Video slots"); position:relative + overflow hidden so the caption
+   overlay and the video's object-fit:cover both stay clipped to the frame */
+.home .motion-phone-screen{position:relative;overflow:hidden;width:194px;height:420px;border-radius:28px;background:#0d1524}
 .home .motion-phone--lg .motion-phone-screen{width:230px;height:498px;border-radius:32px}
-.home .motion-phone-screen .icon{width:30px;height:30px;color:rgba(234,240,248,.4)}
-.home .motion-phone-screen-label{font:600 11px/1.4 var(--home-font-mono);letter-spacing:.08em;color:rgba(234,240,248,.42);text-transform:uppercase;text-align:center;padding-inline:18px}
+.home .motion-phone-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:linear-gradient(165deg,#16213570,#0d152470)}
+.home .motion-phone-caption-overlay{position:absolute;left:0;right:0;bottom:0;padding:16px 14px 14px;background:linear-gradient(180deg,rgba(13,21,36,0) 0%,rgba(13,21,36,.86) 62%);font:600 11px/1.4 var(--home-font-mono);letter-spacing:.08em;color:rgba(234,240,248,.9);text-transform:uppercase;text-align:center}
 .home .motion-phone-caption{font:600 13px/1 var(--home-font-mono);letter-spacing:.1em;color:#8A7B58;margin-top:16px}
 
 /* ---------- private-by-architecture ---------- */
@@ -261,5 +288,6 @@
   .home .home-nav .links{gap:12px}
   .home .home-nav .links a:not(.cta-pill){display:none}
   .home .hero-tag{display:none}
+  .home .hero-drag-hint{display:none}
   .home .hero-poster-grid{grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,34px);gap:10px}
 }
