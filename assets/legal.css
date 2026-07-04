@@ -1,0 +1,53 @@
+/* Legal / support prose pages (privacy.html, support.html).
+   Reuses the .home scope + design tokens from home.css so the nav, footer,
+   and typography match the redesigned index.html. These pages stay
+   JavaScript-free (no scroll-reveal, no scroll-solid nav swap), so the nav
+   and footer get static light-theme variants instead of nav.js's dynamic
+   transparent-to-solid toggle. */
+
+/* Privacy/support fully adopt the new site's fixed (non-dark-mode-adaptive)
+   brand palette — same call already made for index.html in home.css. Without
+   this, body keeps style.css's dark-mode --paper swap and any gap around the
+   centered .home-footer box (it isn't full-bleed) shows through as a dark
+   band. */
+body.home-page{background:var(--paper)}
+
+.home .home-nav--page{background:rgba(246,244,239,.92);backdrop-filter:saturate(1.5) blur(16px);-webkit-backdrop-filter:saturate(1.5) blur(16px);border-bottom:1px solid var(--hairline);box-shadow:0 6px 22px rgba(28,36,56,.06)}
+.home .home-nav--page .brand{color:var(--ink)}
+.home .home-nav--page .links a:not(.cta-pill){color:var(--ink-dim)}
+.home .home-nav--page .links a:not(.cta-pill):hover{color:var(--ink)}
+.home .home-nav--page .links a[aria-current="page"]{color:var(--home-gold)}
+
+/* home-footer is transparent by default — on index.html it sits inside the
+   dark .download section, which supplies the background it was designed
+   against. Here it's a standalone sibling with nothing behind it, so it
+   needs its own explicit background instead of inheriting body's (which
+   can be dark in system dark mode, making the light-on-dark footer text
+   unreadable). */
+.home .home-footer--page{border-top-color:var(--hairline);padding-bottom:clamp(40px,5vw,64px)}
+.home .home-footer--page .brand .name{color:var(--ink)}
+.home .home-footer--page .links a{color:var(--ink-dim)}
+.home .home-footer--page .links a:hover{color:var(--home-gold)}
+.home .home-footer--page .copyright{color:rgba(93,104,128,.8)}
+
+.home .legal{background:var(--paper)}
+
+.home .legal-header{max-width:760px;margin:0 auto;padding:clamp(96px,14vw,160px) clamp(20px,5vw,64px) 0}
+.home .legal-kicker{font-family:var(--home-font-mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--home-gold);margin-bottom:14px}
+.home .legal-header h1{font-family:var(--home-font-display);font-weight:600;font-size:clamp(38px,6vw,58px);line-height:1.08;letter-spacing:-.01em;color:var(--ink);margin:0 0 18px}
+.home .legal-header h1 em{font-style:italic;color:var(--home-navy)}
+.home .legal-lead{font-size:18px;line-height:1.6;color:var(--ink-dim);max-width:640px}
+.home .legal-lead b{color:var(--ink);font-weight:600}
+.home .legal-meta{font-family:var(--home-font-mono);font-size:12px;color:var(--ink-dim);margin-top:22px}
+
+.home .legal-content{max-width:760px;margin:0 auto;padding:0 clamp(20px,5vw,64px) clamp(64px,8vw,110px)}
+.home .legal-content h2{font-family:var(--home-font-display);font-weight:600;font-size:27px;line-height:1.2;color:var(--ink);margin:46px 0 6px}
+.home .legal-content .rule{height:1px;background:var(--hairline);margin:8px 0 20px;position:relative}
+.home .legal-content .rule::before{content:"";position:absolute;left:0;top:-1px;width:56px;height:3px;background:var(--home-gold)}
+.home .legal-content h3{font-family:var(--home-font-body);font-size:16px;font-weight:600;color:var(--ink);margin:24px 0 6px}
+.home .legal-content p{font-size:15.5px;line-height:1.65;color:var(--ink-dim);margin:0 0 14px}
+.home .legal-content p strong,.home .legal-content p b{color:var(--ink);font-weight:600}
+.home .legal-content p em{font-style:italic;color:var(--ink)}
+.home .legal-content a{color:var(--home-gold);text-decoration:none;border-bottom:1px solid rgba(184,134,11,.28)}
+.home .legal-content a:hover{border-bottom-color:var(--home-gold)}
+.home .legal-content code{font-family:var(--home-font-mono);font-size:13px;background:rgba(30,58,95,.07);padding:1px 6px;border-radius:4px;color:var(--ink)}

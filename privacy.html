@@ -8,129 +8,145 @@
   <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
   <link rel="apple-touch-icon" href="assets/icon.svg">
   <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/home.css">
+  <link rel="stylesheet" href="assets/legal.css">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'none'; form-action 'none'; base-uri 'self'">
 </head>
-<body>
-<div class="wrap">
+<body class="home-page">
+<div class="home" id="top">
 
-  <nav class="site">
-    <img src="assets/icon.svg" alt="">
-    <span class="name">Cubby</span>
-    <a href="index.html">Home</a>
-    <a href="privacy.html" aria-current="page">Privacy</a>
-    <a href="support.html">Support</a>
+  <nav class="home-nav home-nav--page">
+    <a class="brand" href="index.html">
+      <img src="assets/icon.svg" alt="">
+      <span class="name">Cubby</span>
+    </a>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="privacy.html" aria-current="page">Privacy</a>
+      <a href="support.html">Support</a>
+      <a class="cta-pill" href="index.html#download">Get the app</a>
+    </div>
   </nav>
 
-  <main class="prose">
-    <header class="page">
-      <div class="kicker">Cubby · privacy</div>
+  <main class="legal">
+    <div class="legal-header">
+      <div class="legal-kicker">Cubby · privacy</div>
       <h1>What's in your bins is <em>your business</em>.</h1>
-      <p class="lead">
+      <p class="legal-lead">
         Cubby is an inventory app for iPhone and iPad that helps you find
         things stored in bins. This page describes what data Cubby handles
         and what it does with it. The short version:
         <b>your inventory, photos, and tags stay on your device unless you
         explicitly share them.</b>
       </p>
-      <p class="mono">Last updated: 28 June 2026</p>
-    </header>
+      <p class="legal-meta">Last updated: 28 June 2026</p>
+    </div>
 
-    <h2>What Cubby collects</h2><div class="rule"></div>
-    <p>
-      <strong>Nothing.</strong> Cubby has no accounts, no sign-in, no
-      analytics, no crash-reporting SDK, no advertising identifiers, and no
-      third-party SDKs of any kind. The developer receives no data from the
-      app — there is no Cubby server for it to be sent to. The one exception is
-      the optional product-barcode look-up described below, which sends only a
-      scanned barcode to a public database — never anything about you.
-    </p>
+    <div class="legal-content">
+      <h2>What Cubby collects</h2><div class="rule"></div>
+      <p>
+        <strong>Nothing.</strong> Cubby has no accounts, no sign-in, no
+        analytics, no crash-reporting SDK, no advertising identifiers, and no
+        third-party SDKs of any kind. The developer receives no data from the
+        app — there is no Cubby server for it to be sent to. The one exception is
+        the optional product-barcode look-up described below, which sends only a
+        scanned barcode to a public database — never anything about you.
+      </p>
 
-    <h2>Where your inventory lives</h2><div class="rule"></div>
-    <p>
-      Your racks, bins, items, quantities, and activity history are stored
-      in a database on your device. Item photos are saved as files in the
-      app's own storage area. None of this is uploaded or transmitted by
-      Cubby. If you choose to share something — for example a printed label
-      PDF via the iOS share sheet, to Files, AirDrop, Mail, or a printer —
-      that destination's privacy policy governs the file from that point on.
-    </p>
+      <h2>Where your inventory lives</h2><div class="rule"></div>
+      <p>
+        Your racks, bins, items, quantities, and activity history are stored
+        in a database on your device. Item photos are saved as files in the
+        app's own storage area. None of this is uploaded or transmitted by
+        Cubby. If you choose to share something — for example a printed label
+        PDF via the iOS share sheet, to Files, AirDrop, Mail, or a printer —
+        that destination's privacy policy governs the file from that point on.
+      </p>
 
-    <h2>Camera access</h2><div class="rule"></div>
-    <p>
-      Cubby requests camera access so you can photograph an item and let the
-      app suggest a name for it. Identification uses Apple's on-device Vision
-      framework: the analysis runs entirely on your device, camera frames are
-      used only while you are adding an item, and no image is uploaded
-      anywhere. The photo you keep with an item is stored locally with that
-      item and nowhere else. Decline camera access and you can still add and
-      name items by hand.
-    </p>
+      <h2>Camera access</h2><div class="rule"></div>
+      <p>
+        Cubby requests camera access so you can photograph an item and let the
+        app suggest a name for it. Identification uses Apple's on-device Vision
+        framework: the analysis runs entirely on your device, camera frames are
+        used only while you are adding an item, and no image is uploaded
+        anywhere. The photo you keep with an item is stored locally with that
+        item and nowhere else. Decline camera access and you can still add and
+        name items by hand.
+      </p>
 
-    <h2>NFC and QR tags</h2><div class="rule"></div>
-    <p>
-      Cubby reads and writes NFC tags and reads QR codes on your racks and
-      bins. A tag holds only a link that identifies a bin or rack — for
-      example <code>https://gotcubby.com/b/&lt;id&gt;</code>. <strong>The tag
-      never contains the bin's contents</strong>; the contents are always
-      looked up locally on your device from that identifier. Anyone who taps
-      one of your tags with another phone sees only the link, not what is in
-      the bin. Reading a tag requires no network connection.
-    </p>
+      <h2>NFC and QR tags</h2><div class="rule"></div>
+      <p>
+        Cubby reads and writes NFC tags and reads QR codes on your racks and
+        bins. A tag holds only a link that identifies a bin or rack — for
+        example <code>https://gotcubby.com/b/&lt;id&gt;</code>. <strong>The tag
+        never contains the bin's contents</strong>; the contents are always
+        looked up locally on your device from that identifier. Anyone who taps
+        one of your tags with another phone sees only the link, not what is in
+        the bin. Reading a tag requires no network connection.
+      </p>
 
-    <h2>Barcodes you capture</h2><div class="rule"></div>
-    <p>
-      If you scan a product barcode while adding an item, Cubby stores the
-      barcode value locally with that item. If <strong>product look-up</strong>
-      is on — it is on by default — Cubby sends <em>only that barcode number</em>
-      to a public product database (<code>api.upcitemdb.com</code>) to fetch a
-      suggested name. This is the <strong>single outbound network request</strong>
-      Cubby makes, and it contains nothing but the barcode — no item details, no
-      identifiers, nothing about you. You can switch it off under
-      <strong>Settings → Product lookup</strong> to keep every barcode scan fully
-      on your device. The suggested name is only ever a suggestion you review;
-      the barcode itself is never used as the item's name.
-    </p>
+      <h2>Barcodes you capture</h2><div class="rule"></div>
+      <p>
+        If you scan a product barcode while adding an item, Cubby stores the
+        barcode value locally with that item. If <strong>product look-up</strong>
+        is on — it is on by default — Cubby sends <em>only that barcode number</em>
+        to a public product database (<code>api.upcitemdb.com</code>) to fetch a
+        suggested name. This is the <strong>single outbound network request</strong>
+        Cubby makes, and it contains nothing but the barcode — no item details, no
+        identifiers, nothing about you. You can switch it off under
+        <strong>Settings → Product lookup</strong> to keep every barcode scan fully
+        on your device. The suggested name is only ever a suggestion you review;
+        the barcode itself is never used as the item's name.
+      </p>
 
-    <h2>Multi-device sync</h2><div class="rule"></div>
-    <p>
-      Cubby does <strong>not</strong> sync across devices. Your inventory lives on
-      the one device — there is no Cubby account and no Cubby server holding a
-      copy, and no iCloud sync. If you have iCloud Backup enabled at the system
-      level, your Cubby data may be included in your device's standard encrypted
-      iCloud Backup (so it can restore to a new phone), which is governed by
-      Apple — but Cubby itself performs no sync of its own.
-    </p>
+      <h2>Multi-device sync</h2><div class="rule"></div>
+      <p>
+        Cubby does <strong>not</strong> sync across devices. Your inventory lives on
+        the one device — there is no Cubby account and no Cubby server holding a
+        copy, and no iCloud sync. If you have iCloud Backup enabled at the system
+        level, your Cubby data may be included in your device's standard encrypted
+        iCloud Backup (so it can restore to a new phone), which is governed by
+        Apple — but Cubby itself performs no sync of its own.
+      </p>
 
-    <h2>On-device processing</h2><div class="rule"></div>
-    <p>
-      Everything Cubby does — storing your inventory, identifying items,
-      generating QR labels, building printable label PDFs, and searching —
-      runs on your device. There is no server-side component and no telemetry.
-    </p>
+      <h2>On-device processing</h2><div class="rule"></div>
+      <p>
+        Everything Cubby does — storing your inventory, identifying items,
+        generating QR labels, building printable label PDFs, and searching —
+        runs on your device. There is no server-side component and no telemetry.
+      </p>
 
-    <h2>Children</h2><div class="rule"></div>
-    <p>
-      Cubby is rated 4+. It does not collect any information from anyone, so
-      it does not collect information from children either.
-    </p>
+      <h2>Children</h2><div class="rule"></div>
+      <p>
+        Cubby is rated 4+. It does not collect any information from anyone, so
+        it does not collect information from children either.
+      </p>
 
-    <h2>Changes</h2><div class="rule"></div>
-    <p>
-      If a future version of Cubby changes what data it handles, this policy
-      will be updated and the "Last updated" date revised before that version
-      ships.
-    </p>
+      <h2>Changes</h2><div class="rule"></div>
+      <p>
+        If a future version of Cubby changes what data it handles, this policy
+        will be updated and the "Last updated" date revised before that version
+        ships.
+      </p>
 
-    <h2>Contact</h2><div class="rule"></div>
-    <p>
-      Questions about privacy can be sent to
-      <a href="mailto:contact@abhijitbansal.com">contact@abhijitbansal.com</a>.
-    </p>
+      <h2>Contact</h2><div class="rule"></div>
+      <p>
+        Questions about privacy can be sent to
+        <a href="mailto:contact@abhijitbansal.com">contact@abhijitbansal.com</a>.
+      </p>
+    </div>
   </main>
 
-  <footer class="site">
-    <span><a href="index.html">Home</a> · <a href="support.html">Support</a></span>
-    <span>© 2026 Abhijit Bansal</span>
+  <footer class="home-footer home-footer--page">
+    <a class="brand" href="index.html">
+      <img src="assets/icon.svg" alt="">
+      <span class="name">Cubby</span>
+    </a>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="support.html">Support</a>
+    </div>
+    <div class="copyright">© 2026 Abhijit Bansal</div>
   </footer>
 
 </div>

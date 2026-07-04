@@ -1,11 +1,13 @@
-/* Cubby marketing home page (design_handoff_website rebuild, static pass).
-   Scoped to index.html only — privacy.html/support.html keep using the
-   theme-adaptive tokens in style.css untouched. This page uses the FIXED,
-   non-adaptive design tokens from the handoff README verbatim (the page's
-   light/dark sections are a fixed brand pattern, not a prefers-color-scheme
-   toggle) — this is intentional, not an oversight; it means this page does
-   not follow system dark mode the way the rest of the site does. No JavaScript: every
-   effect here is plain CSS (transitions, :hover, @keyframes, scroll-snap).
+/* Cubby marketing site shell (design_handoff_website rebuild, static pass).
+   Scoped under `.home` — index.html, privacy.html, and support.html all load
+   this file and share its nav/footer/typography components (see legal.css
+   for the privacy/support-specific prose + static-nav variants layered on
+   top). Uses the FIXED, non-adaptive design tokens from the handoff README
+   verbatim (light/dark sections are a fixed brand pattern, not a
+   prefers-color-scheme toggle) — this is intentional, not an oversight; the
+   whole site does not follow system dark mode. No JavaScript on index.html:
+   every effect here is plain CSS (transitions, :hover, @keyframes,
+   scroll-snap) except the hero/reveal/nav scripts loaded separately.
 
    Every ruleset below is scoped under `.home` — index.html loads BOTH
    style.css and this file, and style.css has several unscoped bare-element
