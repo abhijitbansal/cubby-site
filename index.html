@@ -125,6 +125,11 @@
   <path d="M12 3v18M5 8l-2 4 2 4M19 8l2 4-2 4M8 5l4-2 4 2M8 19l4 2 4-2"/>
 </symbol>
 
+<symbol id="i-sparkle" viewBox="0 0 24 24">
+  <path d="M11 3 L13 9 L19 11 L13 13 L11 19 L9 13 L3 11 L9 9 Z" stroke-linejoin="round"/>
+  <path d="M18 15 L18.8 17.2 L21 18 L18.8 18.8 L18 21 L17.2 18.8 L15 18 L17.2 17.2 Z" stroke-linejoin="round"/>
+</symbol>
+
 </defs>
 </svg>
 
@@ -231,7 +236,16 @@
         <div class="card" data-rv data-delay="120">
           <div class="icon-tile icon-tile--sage"><svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg></div>
           <h3>Add items by camera</h3>
-          <p>Point the camera and on-device Vision suggests a name. A sharpness check rejects blurry shots before they're saved.</p>
+          <p>Point the camera and on-device Vision suggests a name instantly. A sharpness check rejects blurry shots before they're saved.</p>
+        </div>
+
+        <div class="card" data-rv>
+          <div class="card-head">
+            <div class="icon-tile icon-tile--gold"><svg class="icon" aria-hidden="true"><use href="#i-sparkle"></use></svg></div>
+            <span class="pill-new">NEW</span>
+          </div>
+          <h3>Smarter naming, still local</h3>
+          <p>An optional on-device AI model — downloaded once from Apple, never the cloud — looks closer at what you photographed and upgrades vague names to specific ones. It runs entirely on your phone.</p>
         </div>
 
         <div class="card" data-rv>
@@ -415,6 +429,11 @@
           <svg class="icon" aria-hidden="true"><use href="#i-cloud-off"></use></svg>
           <h3>No cross-device sync</h3>
           <p>Your inventory lives on the one device — no account, no Cubby server, no iCloud sync of its own.</p>
+        </div>
+        <div class="private-card" data-rv data-delay="300">
+          <svg class="icon" aria-hidden="true"><use href="#i-sparkle"></use></svg>
+          <h3>AI runs on your phone</h3>
+          <p>The naming model is a one-time download straight from Apple — never a Cubby server — and every photo it looks at stays on-device. Nothing about it or your items is ever sent anywhere.</p>
         </div>
       </div>
     </div>

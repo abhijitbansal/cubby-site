@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy Policy — Cubby</title>
-  <meta name="description" content="Cubby's privacy policy: your inventory, photos, and tags stay on your device. The only thing that leaves is an optional barcode look-up you can switch off.">
+  <meta name="description" content="Cubby's privacy policy: your inventory, photos, and tags stay on your device. Analysis and AI naming run locally — the only things that ever leave are an optional barcode look-up and a one-time AI model download, both switchable off.">
   <link rel="canonical" href="https://gotcubby.com/privacy.html">
   <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
   <link rel="apple-touch-icon" href="assets/icon.svg">
@@ -15,7 +15,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Cubby">
   <meta property="og:title" content="Privacy Policy — Cubby">
-  <meta property="og:description" content="Your inventory, photos, and tags stay on your device — the only thing that ever leaves is an optional product-barcode look-up you can switch off.">
+  <meta property="og:description" content="Your inventory, photos, and tags stay on your device — the only things that ever leave are an optional barcode look-up and a one-time AI model download, both switchable off.">
   <meta property="og:url" content="https://gotcubby.com/privacy.html">
   <meta property="og:image" content="https://gotcubby.com/assets/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -24,7 +24,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Privacy Policy — Cubby">
-  <meta name="twitter:description" content="Your inventory, photos, and tags stay on your device — the only thing that ever leaves is an optional product-barcode look-up you can switch off.">
+  <meta name="twitter:description" content="Your inventory, photos, and tags stay on your device — the only things that ever leave are an optional barcode look-up and a one-time AI model download, both switchable off.">
   <meta name="twitter:image" content="https://gotcubby.com/assets/og-image.png">
 </head>
 <body class="home-page">
@@ -55,7 +55,7 @@
         <b>your inventory, photos, and tags stay on your device unless you
         explicitly share them.</b>
       </p>
-      <p class="legal-meta">Last updated: 28 June 2026</p>
+      <p class="legal-meta">Last updated: 11 July 2026</p>
     </div>
 
     <div class="legal-content">
@@ -64,9 +64,12 @@
         <strong>Nothing.</strong> Cubby has no accounts, no sign-in, no
         analytics, no crash-reporting SDK, no advertising identifiers, and no
         third-party SDKs of any kind. The developer receives no data from the
-        app — there is no Cubby server for it to be sent to. The one exception is
-        the optional product-barcode look-up described below, which sends only a
-        scanned barcode to a public database — never anything about you.
+        app — there is no Cubby server for it to be sent to. Two things leave your
+        device, and both are described in full below: the optional product-barcode
+        look-up, which sends only a scanned barcode to a public database; and, if
+        you turn on the optional AI naming feature, a one-time download of the AI
+        model itself from Apple's servers — nothing about you or your photos is
+        ever part of that download.
       </p>
 
       <h2>Where your inventory lives</h2><div class="rule"></div>
@@ -90,6 +93,22 @@
         name items by hand.
       </p>
 
+      <h2>Optional AI naming</h2><div class="rule"></div>
+      <p>
+        Cubby can optionally use a downloadable AI model to suggest more specific
+        item names than the built-in Vision framework alone. Turning this on in
+        <strong>Settings → Enhanced Recognition</strong> downloads the model
+        (about 1.2&nbsp;GB) directly from Apple's servers using Apple's Background
+        Assets system — the same mechanism apps use to download game or app
+        content. That download is a one-time transfer of the model itself; it
+        never includes anything about you, your device, or your inventory. Once
+        downloaded, every photo the model looks at is analyzed entirely on your
+        phone — nothing about the photo, the suggested name, or your usage is
+        ever sent anywhere. The feature is off unless you turn it on, and you can
+        delete the downloaded model at any time from the same Settings screen to
+        reclaim the storage.
+      </p>
+
       <h2>NFC and QR tags</h2><div class="rule"></div>
       <p>
         Cubby reads and writes NFC tags and reads QR codes on your racks and
@@ -107,8 +126,9 @@
         barcode value locally with that item. If <strong>product look-up</strong>
         is on — it is on by default — Cubby sends <em>only that barcode number</em>
         to a public product database (<code>api.upcitemdb.com</code>) to fetch a
-        suggested name. This is the <strong>single outbound network request</strong>
-        Cubby makes, and it contains nothing but the barcode — no item details, no
+        suggested name. This is one of only two things Cubby ever sends or fetches
+        over the network — the other is the optional AI model download described
+        above — and it contains nothing but the barcode — no item details, no
         identifiers, nothing about you. You can switch it off under
         <strong>Settings → Product lookup</strong> to keep every barcode scan fully
         on your device. The suggested name is only ever a suggestion you review;
@@ -117,12 +137,16 @@
 
       <h2>Multi-device sync</h2><div class="rule"></div>
       <p>
-        Cubby does <strong>not</strong> sync across devices. Your inventory lives on
-        the one device — there is no Cubby account and no Cubby server holding a
-        copy, and no iCloud sync. If you have iCloud Backup enabled at the system
-        level, your Cubby data may be included in your device's standard encrypted
-        iCloud Backup (so it can restore to a new phone), which is governed by
-        Apple — but Cubby itself performs no sync of its own.
+        By default, Cubby does <strong>not</strong> sync across devices — your
+        inventory lives on the one device, and there is no Cubby account or Cubby
+        server. You can optionally turn on <strong>iCloud sync</strong> in
+        Settings to share your inventory across your own devices; when you do,
+        your data goes into <em>your own private iCloud account</em>, encrypted
+        and managed entirely by Apple — Cubby has no server of its own and the
+        developer never has access to it. It's off unless you turn it on.
+        Separately, if you have iCloud Backup enabled at the system level, your
+        Cubby data may be included in your device's standard encrypted iCloud
+        Backup regardless of the sync setting, which is also governed by Apple.
       </p>
 
       <h2>On-device processing</h2><div class="rule"></div>
