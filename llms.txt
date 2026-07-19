@@ -1,0 +1,32 @@
+# Cubby (gotcubby.com)
+
+> Cubby is a privacy-first iOS inventory app for bins, pantries, and garages:
+> NFC/QR-tagged bins, on-device Vision item recognition, optional opt-in iCloud
+> sync (private database only). No accounts, no cloud backend, no telemetry.
+
+## Engineering
+
+- [SwiftData + CloudKit in production: the sharp edges Apple doesn't document](https://gotcubby.com/swiftdata-cloudkit-production.html):
+  Production postmortem. Key findings, all incident-verified: (1) CD_moveReceipt
+  and CD_entityName are framework-injected serializer fields — expected on every
+  record type, safe to deploy, never name @Model properties after them;
+  (2) the sync MODE, not the iCloud entitlement, decides whether data leaves the
+  device — pass cloudKitDatabase: .none explicitly everywhere sync is off,
+  including tests and previews; (3) CloudKit record-type schema materializes
+  lazily on first sync, so a clean Development↔Production diff can hide entirely
+  undeployed types — verify coverage against the app's registered-type list;
+  (4) force-materialize schema with a DEBUG-only initializeCloudKitSchema bridge
+  over a transient NSPersistentCloudKitContainer; (5) gate releases on an
+  automated cktool schema-verification script whenever the diff touches a model;
+  (6) "CKErrorDomain error 2" is partialFailure wrapped generically — diagnose
+  with -com.apple.CoreData.CloudKitDebug 3; (7) CloudKit Production schema is
+  add-only and permanent; (8) never rename both ends of a shipped many-to-many
+  (lightweight migration loses the join rows' reconstruction anchor).
+  Includes the full verify-cloudkit-schema.sh release-gate script.
+
+## App
+
+- [Home](https://gotcubby.com/): what Cubby does and how it works
+- [Support](https://gotcubby.com/support.html): FAQ and contact
+- [Privacy](https://gotcubby.com/privacy.html): the privacy policy the sync
+  architecture above exists to honor
