@@ -65,12 +65,12 @@
       <h2>The field nobody wrote</h2><div class="rule"></div>
       <p>
         Start with the mystery, because it's the best illustration of how opaque
-        this stack is. Preparing a schema deploy, I exported Cubby's CloudKit
-        schema with <code>cktool</code> and found that <strong>every single record
-        type</strong> carried two fields I had never defined:
+        this stack is. Preparing a schema deploy, I opened the CloudKit Console's
+        "Deploy Schema Changes to Production" diff and found that <strong>every
+        single record type</strong> carried a field I had never defined:
       </p>
-      <pre><code>CD_moveReceipt        BYTES
-CD_moveReceipt_ckAsset  ASSET</code></pre>
+      <pre><code>CD_moveReceipt          BYTES
+CD_moveReceipt_ckAsset  (its overflow companion)</code></pre>
       <p>
         No property called <code>moveReceipt</code> exists in any Cubby model. It
         isn't anywhere in git history. And CloudKit Production schema is
@@ -188,10 +188,13 @@ let config = isICloudSyncEnabled
 
       <h2>Incident one: the sync that silently stopped</h2><div class="rule"></div>
       <p>
-        Cubby v0.4.0 shipped a feature wave that added eight <code>@Model</code>
-        schema additions. Dev builds synced perfectly. Nobody deployed the schema
-        to Production. TestFlight users then hit per-record export rejections for
-        anything touching the new fields — surfaced as the maximally unhelpful:
+        Cubby v0.4.0 shipped a feature wave that touched the data model in eight
+        separate commits — eleven new <code>@Model</code> fields in all. Dev
+        builds synced perfectly. The Production schema deploy was recorded as
+        done in the release log — but it was incomplete, which is worse than
+        forgotten: there was no open checklist item left to catch it. TestFlight
+        users then hit per-record export rejections for anything touching the new
+        fields — surfaced as the maximally unhelpful:
       </p>
       <pre><code>CKErrorDomain error 2</code></pre>
       <p>
@@ -202,10 +205,13 @@ let config = isICloudSyncEnabled
         everything was still safe locally.
       </p>
       <p>
-        The error message will not tell you this. The real diagnostics come from
-        Core Data's CloudKit debug logging, launched on-device:
+        The error message will not tell you this. We got lucky: this one was
+        root-caused from release logs and git history alone. When you do need
+        the on-device truth — as we did in an earlier incident chasing the
+        optional-relationships requirement — the real diagnostics come from Core
+        Data's CloudKit debug logging, launched on-device:
       </p>
-      <pre><code>xcrun devicectl device process launch --console &lt;device&gt; &lt;bundle-id&gt; -- \
+      <pre><code>xcrun devicectl device process launch --console --device &lt;device-id&gt; &lt;bundle-id&gt; -- \
   -com.apple.CoreData.CloudKitDebug 3 -com.apple.CoreData.Logging.stderr 1</code></pre>
       <p>
         Note the bare <code>--</code> separator — without it, devicectl's own
@@ -273,9 +279,10 @@ let config = isICloudSyncEnabled
       <h2>The release gate: automate the step humans forget</h2><div class="rule"></div>
       <p>
         Both incidents share one root cause: <em>a manual Console step with no
-        feedback loop</em>. We forgot it twice; a hand-maintained "fields to
-        deploy" checklist item drifted out of date across sessions. Checklists
-        don't fix this. A release gate does.
+        feedback loop</em>. It shipped broken twice — once believed-done but
+        incomplete, once with nothing visibly left to do at all — and the
+        hand-maintained "fields to deploy" checklist item drifted out of date
+        across sessions. Checklists don't fix this. A release gate does.
       </p>
       <p>Cubby's release pipeline now runs a verify script whenever the diff since the last release tag touches a model file:</p>
       <ul>
@@ -284,10 +291,11 @@ let config = isICloudSyncEnabled
         registered-type list, then the Dev↔Prod diff.</li>
         <li>The release hook triggers it <strong>only for model-touching
         releases</strong>; a pure UI release skips it automatically.</li>
-        <li>An explicit <code>SKIP_CLOUDKIT_SCHEMA_CHECK=1</code> escape hatch
-        exists for machines without a CloudKit management token — a gate that can
-        strand a release gets deleted, so it must fail open <em>loudly</em>
-        rather than hard-block.</li>
+        <li>The gate <strong>fails closed</strong>: no token, or any drift, and
+        the release aborts. The escape hatch — <code>SKIP_CLOUDKIT_SCHEMA_CHECK=1</code>,
+        for machines without a CloudKit management token or a hand-verified
+        schema — must be set explicitly up front, so bypassing the gate is a
+        deliberate, visible choice rather than a silent fallback.</li>
         <li>It is read-only by design: it exports and diffs, never writes schema.
         Deploying stays a deliberate human action.</li>
       </ul>
