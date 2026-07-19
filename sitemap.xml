@@ -13,6 +13,12 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://gotcubby.com/swiftdata-cloudkit-production.html</loc>
+    <lastmod>2026-07-18</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://gotcubby.com/privacy.html</loc>
     <lastmod>2026-07-03</lastmod>
     <changefreq>yearly</changefreq>

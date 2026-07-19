@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SwiftData + CloudKit in production: the sharp edges Apple doesn't document — Cubby Engineering</title>
+  <meta name="description" content="A production postmortem: the mystery CD_moveReceipt field, the .automatic sync trap, lazy schema materialization that passes a clean diff while losing data, and the release gate that stops it happening again.">
+  <link rel="canonical" href="https://gotcubby.com/swiftdata-cloudkit-production.html">
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="apple-touch-icon" href="assets/icon.svg">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/home.css">
+  <link rel="stylesheet" href="assets/legal.css">
+  <link rel="stylesheet" href="assets/article.css">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'none'; form-action 'none'; base-uri 'self'">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Cubby">
+  <meta property="og:title" content="SwiftData + CloudKit in production: the sharp edges Apple doesn't document">
+  <meta property="og:description" content="The mystery CD_moveReceipt field, the .automatic sync trap, lazy schema materialization, and the release gate that stops silent data loss.">
+  <meta property="og:url" content="https://gotcubby.com/swiftdata-cloudkit-production.html">
+  <meta property="og:image" content="https://gotcubby.com/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Cubby — find anything in your bins">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SwiftData + CloudKit in production: the sharp edges Apple doesn't document">
+  <meta name="twitter:description" content="A production postmortem from building Cubby's iCloud sync.">
+  <meta name="twitter:image" content="https://gotcubby.com/assets/og-image.png">
+</head>
+<body class="home-page">
+<div class="home" id="top">
+
+  <nav class="home-nav home-nav--page">
+    <a class="brand" href="index.html">
+      <img src="assets/icon.svg" alt="">
+      <span class="name">Cubby</span>
+    </a>
+    <div class="links">
+      <a href="index.html#features">What it does</a>
+      <a href="index.html#how">How it works</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="support.html">Support</a>
+      <a class="cta-pill" href="index.html#download">Get the app</a>
+    </div>
+  </nav>
+
+  <main class="legal article">
+    <div class="legal-header">
+      <div class="legal-kicker">Cubby · engineering</div>
+      <h1>SwiftData + CloudKit in production: <em>the sharp edges Apple doesn't document</em></h1>
+      <p class="legal-lead">
+        Cubby is a small, privacy-first inventory app with optional iCloud sync.
+        Shipping that sync to TestFlight produced two production incidents, one
+        binary-forensics investigation, and a set of rules I wish someone had
+        written down before me. This is that writeup: what actually happens
+        between your <code>@Model</code> types and the CloudKit Console, where
+        it silently fails, and the automated gate that keeps it from failing again.
+      </p>
+      <p class="legal-meta">July 2026 · Abhijit Bansal · built from Cubby's incident logs</p>
+    </div>
+
+    <div class="legal-content">
+
+      <h2>The field nobody wrote</h2><div class="rule"></div>
+      <p>
+        Start with the mystery, because it's the best illustration of how opaque
+        this stack is. Preparing a schema deploy, I exported Cubby's CloudKit
+        schema with <code>cktool</code> and found that <strong>every single record
+        type</strong> carried two fields I had never defined:
+      </p>
+      <pre><code>CD_moveReceipt        BYTES
+CD_moveReceipt_ckAsset  ASSET</code></pre>
+      <p>
+        No property called <code>moveReceipt</code> exists in any Cubby model. It
+        isn't anywhere in git history. And CloudKit Production schema is
+        <em>add-only and permanent</em> — you don't deploy a field you can't
+        explain.
+      </p>
+      <p>
+        First theory: an orphan from some past experiment in the Development
+        environment. Refuted — a <code>cktool reset-schema</code> plus
+        re-initialization brought it straight back. Second theory: something in
+        our generated model. Refuted with a diagnostic unit test proving the
+        <code>NSManagedObjectModel</code> we hand to CloudKit contains
+        <strong>zero</strong> attributes matching <code>receipt</code>.
+      </p>
+      <p>
+        What settled it was going below the API: running <code>strings</code>
+        against the CoreData framework binary itself — both the device build and
+        the Simulator-runtime copy, which carries symbols the public stub lacks.
+        Both contain <code>NSCKRecordZoneMoveReceipt</code>, the Apple-internal
+        source path <code>Sources/Persistence/NSCKRecordZoneMoveReceipt.m</code>,
+        methods like <code>createEncodedMoveReceiptData:</code> and
+        <code>mergeMoveReceiptsWithData:</code>, and a <code>CD_FAKE_</code>
+        synthetic-record marker.
+      </p>
+      <p>
+        So: <code>CD_moveReceipt</code> is Core Data's own record-zone-move
+        bookkeeping (share/unshare support), injected by the CloudKit serializer
+        at CKRecord-generation time — the same category as the documented
+        <code>CD_entityName</code> discriminator. It is <strong>invisible at the
+        <code>NSManagedObjectModel</code> stage</strong>, which is why a
+        model-completeness test shows clean while the schema export shows the
+        field. Both results are correct; there is no contradiction. It is safe to
+        deploy — and actually <em>necessary</em> if you ever plan to use
+        <code>CKShare</code>, because Production never creates fields on demand
+        and a zone move would hard-fail without it.
+      </p>
+      <div class="callout">
+        <p><strong>Rules that fall out of this:</strong></p>
+        <p>1. Never name a <code>@Model</code> property <code>moveReceipt</code>,
+        <code>moveReceipts</code>, or <code>entityName</code> — they collide with
+        the framework-injected fields. (<code>isDeleted</code> is separately
+        reserved by <code>NSManagedObject</code>.)</p>
+        <p>2. When a mystery <code>CD_</code> field appears, don't chase it as an
+        orphan. Cheap checks first (schema reset, model test), then
+        <code>strings</code>/<code>nm</code> on the real framework binary — and
+        independently re-verify before any irreversible Production deploy.</p>
+      </div>
+
+      <h2>How the schema lifecycle actually works</h2><div class="rule"></div>
+      <p>
+        None of the incidents below make sense without this background, and no
+        single Apple doc states it end-to-end:
+      </p>
+      <ul>
+        <li><strong>Development builds create schema; Production builds can't.</strong>
+        A debug build with sync enabled auto-creates record types in the CloudKit
+        <em>Development</em> environment as records sync. TestFlight and App
+        Store builds talk to <em>Production</em>, where schema is read-only.</li>
+        <li><strong>Promotion is a manual step.</strong> "Deploy Schema Changes to
+        Production" in the CloudKit Console (or <code>cktool</code>). Nothing in
+        your build or release pipeline does this for you, and nothing warns you
+        when you forget.</li>
+        <li><strong>Production is add-only.</strong> You can never rename, delete,
+        or retype a live Production field. A wrong field stays forever
+        (harmlessly), so plan names before the first deploy.</li>
+      </ul>
+      <p>
+        Everything that went wrong for us lives in the gap between "my dev build
+        works" and "the schema my TestFlight users need actually exists in
+        Production."
+      </p>
+
+      <h2>The <code>.automatic</code> trap</h2><div class="rule"></div>
+      <p>
+        Before any schema trouble, the first sharp edge is on-device:
+        <strong>the sync mode, not the entitlement, decides whether data leaves
+        the device.</strong> The moment your app has an iCloud container
+        entitlement, SwiftData's default <code>cloudKitDatabase: .automatic</code>
+        starts syncing — whether or not the user opted in.
+      </p>
+      <p>
+        Cubby's sync is opt-in and off by default, so local-only mode passes
+        <code>.none</code> <em>explicitly</em>:
+      </p>
+      <pre><code>// The entitlement exists either way — the MODE is the privacy boundary.
+let config = isICloudSyncEnabled
+    ? ModelConfiguration(schema: schema, cloudKitDatabase: .private(containerID))
+    : ModelConfiguration(schema: schema, cloudKitDatabase: .none)</code></pre>
+      <p>
+        This extends further than you'd think: <strong>every in-memory test and
+        preview configuration must also pass <code>.none</code></strong>. Forget
+        one, and a unit-test run on a machine signed into iCloud can start
+        talking to your real container.
+      </p>
+
+      <h2>Model rules and the rename-safety boundary</h2><div class="rule"></div>
+      <p>
+        CloudKit-backed SwiftData imposes model constraints: every property needs
+        a default value and <strong>all relationships must be optional</strong>.
+        Retrofitting that onto an existing model invites a tempting refactor: keep
+        the API, rename the stored property — <code>x</code> becomes stored
+        <code>xStorage</code> plus a computed <code>x</code>.
+      </p>
+      <p>
+        That wrapper rename is migration-safe <em>only</em> when an unchanged
+        to-one foreign key on the child side anchors reconstruction of the
+        renamed to-many side during lightweight migration. A many-to-many with
+        <strong>both ends renamed has no unchanged anchor</strong> — join rows
+        can silently orphan, with nothing to rebuild them from. On a store
+        already shipped to users, keep the original stored property name and add
+        the optionality in place. In Cubby this exact hazard was caught in review
+        twice before it could ship; "the migration ran without errors" would have
+        been the only symptom.
+      </p>
+
+      <h2>Incident one: the sync that silently stopped</h2><div class="rule"></div>
+      <p>
+        Cubby v0.4.0 shipped a feature wave that added eight <code>@Model</code>
+        schema additions. Dev builds synced perfectly. Nobody deployed the schema
+        to Production. TestFlight users then hit per-record export rejections for
+        anything touching the new fields — surfaced as the maximally unhelpful:
+      </p>
+      <pre><code>CKErrorDomain error 2</code></pre>
+      <p>
+        That's <code>partialFailure</code>, wrapped generically. The visible
+        symptom was worse than a crash: <strong>items that silently never
+        synced</strong>. From the user's chair it looks like iCloud "lost" data —
+        in reality the records were never accepted for upload at all, and
+        everything was still safe locally.
+      </p>
+      <p>
+        The error message will not tell you this. The real diagnostics come from
+        Core Data's CloudKit debug logging, launched on-device:
+      </p>
+      <pre><code>xcrun devicectl device process launch --console &lt;device&gt; &lt;bundle-id&gt; -- \
+  -com.apple.CoreData.CloudKitDebug 3 -com.apple.CoreData.Logging.stderr 1</code></pre>
+      <p>
+        Note the bare <code>--</code> separator — without it, devicectl's own
+        argument parser swallows the dash-prefixed app arguments and you'll
+        wonder why the flags did nothing.
+      </p>
+
+      <h2>Incident two: the diff that lied</h2><div class="rule"></div>
+      <p>
+        After incident one, the obvious safeguard is "diff Development against
+        Production before every release." We built that — and it would not have
+        caught the very next problem.
+      </p>
+      <p>
+        A record type's CloudKit schema materializes <strong>lazily, on the first
+        sync of a record of that type</strong>. If no dev build ever created and
+        synced an instance of some type, that type is absent from
+        <em>both</em> environments. The Dev↔Prod diff reads clean while
+        the type is entirely undeployed.
+      </p>
+      <p>
+        When we audited Cubby, only <strong>6 of 10 registered model types</strong>
+        actually existed in Production. The other four — newer types like custom
+        fields, saved searches, and the move-session pair — had simply never been
+        exercised against CloudKit by a dev build. Any TestFlight user's records
+        of those types would fail per-record export, silently, forever.
+      </p>
+      <p>Schema verification therefore needs <strong>two checks</strong>, and the second one is the one nobody writes:</p>
+      <ul>
+        <li><strong>Dev↔Prod diff</strong> — catches materialized-but-not-promoted changes.</li>
+        <li><strong>Model-coverage check</strong> — diff Production against your
+        app's own source-of-truth type list (the Swift array you register the
+        schema from). This is the check that catches never-materialized types,
+        because the app model is the only artifact that knows they should exist.</li>
+      </ul>
+
+      <h2>Force-materializing the schema: a DEBUG initializer</h2><div class="rule"></div>
+      <p>
+        The durable fix for lazy materialization is to stop depending on organic
+        usage traffic to create schema. Core Data has the API —
+        <code>initializeCloudKitSchema</code> — it's just on
+        <code>NSPersistentCloudKitContainer</code>, not SwiftData. The bridge is
+        small:
+      </p>
+      <ul>
+        <li>Generate the managed object model from the same authoritative type
+        list SwiftData uses: <code>NSManagedObjectModel.makeManagedObjectModel(for:)</code>.
+        One source of truth, no hand-maintained <code>.xcdatamodel</code>.</li>
+        <li>Stand up a <strong>transient</strong> <code>NSPersistentCloudKitContainer</code>
+        over a throwaway scratch store in its own temp directory — never the
+        app's live store.</li>
+        <li>Call <code>initializeCloudKitSchema(options:)</code>. Every entity and
+        field materializes in Development in one shot. (<code>.dryRun</code>
+        validates without uploading.)</li>
+        <li>Tear down and delete the scratch directory — including Core Data's
+        hidden <code>.&lt;store&gt;_SUPPORT/</code> sibling.</li>
+      </ul>
+      <p>
+        The whole file is wrapped in <code>#if DEBUG</code>, so the initializer —
+        and with it any ability to push schema — is compiled out of Release
+        builds entirely. It runs from a debug maintenance menu; a human still
+        performs the Dev→Production deploy in the Console, deliberately.
+      </p>
+
+      <h2>The release gate: automate the step humans forget</h2><div class="rule"></div>
+      <p>
+        Both incidents share one root cause: <em>a manual Console step with no
+        feedback loop</em>. We forgot it twice; a hand-maintained "fields to
+        deploy" checklist item drifted out of date across sessions. Checklists
+        don't fix this. A release gate does.
+      </p>
+      <p>Cubby's release pipeline now runs a verify script whenever the diff since the last release tag touches a model file:</p>
+      <ul>
+        <li>It exports both environments' schema with <code>cktool</code> and runs
+        both checks from the previous section — model coverage against the
+        registered-type list, then the Dev↔Prod diff.</li>
+        <li>The release hook triggers it <strong>only for model-touching
+        releases</strong>; a pure UI release skips it automatically.</li>
+        <li>An explicit <code>SKIP_CLOUDKIT_SCHEMA_CHECK=1</code> escape hatch
+        exists for machines without a CloudKit management token — a gate that can
+        strand a release gets deleted, so it must fail open <em>loudly</em>
+        rather than hard-block.</li>
+        <li>It is read-only by design: it exports and diffs, never writes schema.
+        Deploying stays a deliberate human action.</li>
+      </ul>
+      <p>The full script, as it runs in Cubby's pipeline (swap the team/container IDs at the top):</p>
+      <details>
+        <summary>verify-cloudkit-schema.sh — the full release-gate script</summary>
+<pre><code>#!/usr/bin/env bash
+#
+# Verify Cubby&#x27;s CloudKit PRODUCTION schema matches DEVELOPMENT — i.e. that every
+# @Model schema change has actually been deployed to Production.
+#
+# Why this exists: TestFlight/App Store builds talk to CloudKit **Production**; dev
+# builds auto-create schema in **Development** from the current SwiftData model. So
+# Development is the app-model ground truth, and any record type / field present in
+# Development but MISSING from Production is a change that was never deployed —
+# exactly the BUG-039 failure (undeployed field → per-record export rejection →
+# generic &quot;CKErrorDomain error 2&quot; → items that silently never sync). Run this as a
+# release preflight whenever a release&#x27;s diff touches a @Model.
+#
+# Read-only: it EXPORTS schema and diffs. It never writes schema, never touches
+# records, never touches data. (Deploying the fix stays a Console &quot;Deploy Schema
+# Changes to Production&quot; action, or `cktool import-schema` — add-only, deliberate,
+# not automated here.)
+#
+# Ground-truth caveat: Development only reflects the CURRENT model if a current dev
+# build has actually run against CloudKit Development (sync ON) and materialized the
+# schema. Run the app once on the simulator/device with sync enabled before trusting
+# a &quot;clean&quot; result.
+#
+# Setup (once): create a CloudKit **management token** and save it to the keychain.
+#   1. https://icloud.developer.apple.com/dashboard → gear / Settings → &quot;Tokens&quot;
+#      → create a &quot;CloudKit Management Token&quot;, copy it.
+#   2. xcrun cktool save-token --type management     # secure prompt, keychain-stored
+# The token is a powerful credential (can modify/reset schema). Keep it in the
+# keychain (the default) — never commit it, never pass it on an argv the shell logs.
+# cktool also accepts it via the CLOUDKIT_MANAGEMENT_TOKEN env var if you prefer.
+#
+# Usage:
+#   ./scripts/verify-cloudkit-schema.sh
+#   TEAM_ID=XXXX CONTAINER_ID=iCloud.foo ./scripts/verify-cloudkit-schema.sh  # override
+#
+# Exit codes: 0 = Production matches Development · 1 = drift (undeployed changes) ·
+#             2 = setup problem (cktool missing, no token).
+#
+set -euo pipefail
+
+TEAM_ID=&quot;${TEAM_ID:-XDTAU7RN57}&quot;
+CONTAINER_ID=&quot;${CONTAINER_ID:-iCloud.com.abhijitbansal.Cubby}&quot;
+
+REPO_ROOT=&quot;$(cd &quot;$(dirname &quot;${BASH_SOURCE[0]}&quot;)/..&quot; &amp;&amp; pwd)&quot;
+OUT_DIR=&quot;${REPO_ROOT}/.scratch&quot;          # gitignored
+DEV_FILE=&quot;${OUT_DIR}/cloudkit-schema-development.ckdb&quot;
+PROD_FILE=&quot;${OUT_DIR}/cloudkit-schema-production.ckdb&quot;
+SCHEMA_SWIFT=&quot;$(find &quot;${REPO_ROOT}/Cubby&quot; -name CubbyModelSchema.swift 2&gt;/dev/null | head -1)&quot;
+
+fail() { echo &quot;error: $*&quot; &gt;&amp;2; exit 2; }
+
+command -v xcrun &gt;/dev/null 2&gt;&amp;1 || fail &quot;xcrun not found (need Xcode command-line tools).&quot;
+xcrun --find cktool &gt;/dev/null 2&gt;&amp;1 || fail &quot;cktool not found (ships with Xcode).&quot;
+
+# Token check: any authorized command proves the token resolves. Guard the pipe so
+# set -e doesn&#x27;t kill us before we can print the helpful message.
+if ! xcrun cktool get-teams &gt;/dev/null 2&gt;&amp;1; then
+  cat &gt;&amp;2 &lt;&lt;EOF
+error: no CloudKit management token available.
+  Create one at https://icloud.developer.apple.com/dashboard (Settings → Tokens),
+  then: xcrun cktool save-token --type management
+  (or export CLOUDKIT_MANAGEMENT_TOKEN=&lt;token&gt; for this shell only)
+EOF
+  exit 2
+fi
+
+mkdir -p &quot;${OUT_DIR}&quot;
+
+echo &quot;Exporting schema for ${CONTAINER_ID} (team ${TEAM_ID})…&quot;
+xcrun cktool export-schema --team-id &quot;${TEAM_ID}&quot; --container-id &quot;${CONTAINER_ID}&quot; \
+  --environment development --output-file &quot;${DEV_FILE}&quot;
+xcrun cktool export-schema --team-id &quot;${TEAM_ID}&quot; --container-id &quot;${CONTAINER_ID}&quot; \
+  --environment production  --output-file &quot;${PROD_FILE}&quot;
+
+problems=0
+
+# ── Check 1: model coverage — every registered @Model type has a CD_ record type
+# in PRODUCTION. Stronger than the dev↔prod diff: it compares against the app&#x27;s
+# own source-of-truth type list (CubbyModelSchema), so it catches types whose
+# CloudKit schema has NEVER materialized in EITHER environment (a record type is
+# created lazily, the first time a record of that type syncs — until then it&#x27;s
+# absent from Development too, so the diff below reads &quot;clean&quot; while a whole type
+# is silently undeployed and will fail per-record export on TestFlight).
+echo &quot;── Check 1: model types present in Production schema ──&quot;
+if [[ -n &quot;${SCHEMA_SWIFT}&quot; &amp;&amp; -f &quot;${SCHEMA_SWIFT}&quot; ]]; then
+  # Extract the `Foo.self, Bar.self, …` type names from persistentModelTypes.
+  model_types=&quot;$(sed -n &#x27;/persistentModelTypes/,/]/p&#x27; &quot;${SCHEMA_SWIFT}&quot; \
+    | grep -oE &#x27;[A-Za-z_][A-Za-z0-9_]*\.self&#x27; | sed &#x27;s/\.self//&#x27; | sort -u)&quot;
+  missing=&quot;&quot;
+  for t in ${model_types}; do
+    if ! grep -qE &quot;RECORD TYPE CD_${t}([[:space:]]|\()&quot; &quot;${PROD_FILE}&quot;; then
+      missing+=&quot;  - CD_${t}&quot;$&#x27;\n&#x27;
+    fi
+  done
+  if [[ -n &quot;${missing}&quot; ]]; then
+    problems=1
+    echo &quot;✗ Model types with NO CloudKit schema in Production (will fail to sync on TestFlight):&quot;
+    printf &#x27;%s&#x27; &quot;${missing}&quot;
+    echo &quot;  Cause: no record of these types has synced from a dev build yet, so the&quot;
+    echo &quot;  schema was never materialized. Fix: run a dev build (sync ON) that creates&quot;
+    echo &quot;  one record of each, re-run this script (Development will now show them),&quot;
+    echo &quot;  then Console → Deploy Schema Changes to Production.&quot;
+  else
+    echo &quot;✓ All registered @Model types have a CD_ record type in Production.&quot;
+  fi
+else
+  echo &quot;? Could not locate CubbyModelSchema.swift — skipped model-coverage check.&quot;
+fi
+
+# ── Check 2: no drift between what a dev build materialized (Development) and
+# Production. Catches a change present in Dev but not yet deployed.
+echo
+echo &quot;── Check 2: Production matches Development ──&quot;
+if diff -u &quot;${PROD_FILE}&quot; &quot;${DEV_FILE}&quot; &gt;/dev/null 2&gt;&amp;1; then
+  echo &quot;✓ Production schema matches Development — no undeployed drift.&quot;
+else
+  problems=1
+  echo &quot;✗ Production DIFFERS from Development — some changes are NOT deployed:&quot;
+  # Lines Development has that Production lacks (&#x27;&gt;&#x27; in this diff order).
+  diff &quot;${PROD_FILE}&quot; &quot;${DEV_FILE}&quot; | grep -E &#x27;^&gt; &#x27; | sed &#x27;s/^&gt; /  + /&#x27; || true
+  echo &quot;  ── full unified diff (prod ↴ dev) ──&quot;
+  diff -u &quot;${PROD_FILE}&quot; &quot;${DEV_FILE}&quot; || true
+  echo &quot;  Deploy via Console → Deploy Schema Changes to Production (add-only), then re-run.&quot;
+fi
+
+echo
+echo &quot;  dev:  ${DEV_FILE}&quot;
+echo &quot;  prod: ${PROD_FILE}&quot;
+[[ &quot;${problems}&quot; -eq 0 ]] &amp;&amp; { echo; echo &quot;✓ Schema fully deployed.&quot;; exit 0; }
+echo; echo &quot;✗ Schema NOT fully deployed — see above.&quot;
+exit 1
+</code></pre>
+      </details>
+
+      <h2>The rules, in one place</h2><div class="rule"></div>
+      <ul>
+        <li><strong>The mode, not the entitlement, is the privacy boundary.</strong>
+        Pass <code>cloudKitDatabase: .none</code> explicitly everywhere sync is
+        off — including every test and preview configuration.</li>
+        <li><strong>All properties defaulted, all relationships optional</strong> —
+        and on a shipped store, add optionality in place; never rename both ends
+        of a many-to-many.</li>
+        <li><strong>Dev builds create schema in Development only.</strong>
+        TestFlight talks Production. Promotion is manual and add-only.</li>
+        <li><strong>Schema materializes lazily.</strong> A clean Dev↔Prod diff
+        proves nothing about types that never synced — check coverage against
+        your registered-type list.</li>
+        <li><strong>Force-materialize with a DEBUG-only
+        <code>initializeCloudKitSchema</code> bridge</strong> instead of relying
+        on usage traffic.</li>
+        <li><strong>Gate releases on schema verification</strong> whenever the
+        diff touches a model — automated, read-only, with a loud escape hatch.</li>
+        <li><strong><code>CD_entityName</code> and <code>CD_moveReceipt</code> are
+        Apple's.</strong> Expected on every record type; deploy them; never name
+        model properties after them.</li>
+        <li><strong>When sync fails generically, launch with
+        <code>-com.apple.CoreData.CloudKitDebug 3</code></strong> — the wrapper
+        error always lies.</li>
+      </ul>
+
+      <p>
+        Cubby's sync remains what it was designed to be: opt-in, private-database
+        only, off by default — see the <a href="privacy.html">privacy policy</a>.
+        These are the edges we hit making that promise hold in production.
+        Questions or war stories:
+        <a href="mailto:contact@abhijitbansal.com">contact@abhijitbansal.com</a>.
+      </p>
+
+    </div>
+  </main>
+
+  <footer class="home-footer home-footer--page">
+    <a class="brand" href="index.html">
+      <img src="assets/icon.svg" alt="">
+      <span class="name">Cubby</span>
+    </a>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="support.html">Support</a>
+    </div>
+    <div class="copyright">© 2026 Abhijit Bansal</div>
+  </footer>
+
+</div>
+</body>
+</html>
