@@ -85,6 +85,72 @@
 
     <div class="legal-content">
 
+      <h2>Why sync at all?</h2><div class="rule"></div>
+      <p>
+        Cubby's whole point is answering "where is it?" without a trip to the
+        basement — and that question gets asked from more than one device. You
+        catalog bins on your iPhone standing at the rack, then want the same
+        inventory on the iPad in the kitchen, or on a new phone after an
+        upgrade. Without sync, the answer lives on exactly one device; lose it
+        and you lose the catalog too.
+      </p>
+      <p>
+        The constraint: Cubby's core promise is <strong>no accounts, no cloud
+        backend, no telemetry</strong>. A classic sync service — our server,
+        your data on it — would break that promise on day one. We needed
+        multi-device sync where <em>we never run a server and never see a
+        single item name</em>.
+      </p>
+
+      <h2>Why CloudKit</h2><div class="rule"></div>
+      <p>
+        CloudKit is Apple's answer to exactly that shape of problem, and it's
+        why sync in Cubby could stay a privacy feature instead of becoming a
+        privacy exception:
+      </p>
+      <ul>
+        <li><strong>It's the user's own iCloud.</strong> Data syncs through the
+        <em>private database</em> of your personal iCloud account — per user,
+        in storage you already own, counted against your iCloud quota. There is
+        no Cubby account, and no shared pool.</li>
+        <li><strong>The developer can't read it.</strong> A private-database
+        record is reachable only by the Apple ID that wrote it. We can see our
+        app's <em>schema</em> — the field names and types you'll meet throughout
+        this article — but never your records.</li>
+        <li><strong>No third-party code.</strong> Cubby has a zero-dependency
+        rule; CloudKit is an Apple framework with first-party SwiftData
+        integration (<code>NSPersistentCloudKitContainer</code> under the hood),
+        so sync didn't cost us an SDK we'd have to trust.</li>
+        <li><strong>It can be genuinely optional.</strong> Sync ships OFF by
+        default. Until you flip the toggle, nothing leaves the device — a
+        property this article will complicate shortly.</li>
+      </ul>
+
+      <h2>How CloudKit sync works, in one minute</h2><div class="rule"></div>
+      <p>
+        The mental model you need for everything that follows: your app's local
+        models get mirrored to CloudKit <em>record types</em> (prefixed
+        <code>CD_</code>), whose definitions live in a server-side
+        <strong>schema</strong>. A sync engine ships record changes both ways in
+        the background; conflicts resolve last-writer-wins per field. Two
+        details matter enormously in practice:
+      </p>
+      <ul>
+        <li><strong>There are two environments.</strong> <em>Development</em> —
+        used by debug builds, where schema is created automatically as records
+        sync — and <em>Production</em> — used by TestFlight and App Store
+        builds, where schema is <em>read-only</em> and must be promoted by hand.
+        Most of this postmortem lives in the gap between them.</li>
+        <li><strong>It's per user, not between users.</strong> Private-database
+        sync moves <em>your</em> data between <em>your</em> devices. Sharing
+        with another person is a separate mechanism (<code>CKShare</code>) with
+        its own machinery — including, as it turns out, a mystery field we'll
+        meet immediately.</li>
+      </ul>
+      <p>
+        That's the setup. Here's where it cut us.
+      </p>
+
       <h2>The field nobody wrote</h2><div class="rule"></div>
       <p>
         Start with the mystery, because it's the best illustration of how opaque
