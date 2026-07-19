@@ -295,3 +295,18 @@
   .home .hero-drag-hint{display:none}
   .home .hero-poster-grid{grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,34px);gap:10px}
 }
+
+/* ── Feature index (#everything): the in-app "What's in Cubby" catalog as an
+   expandable list. details/summary only — no JS dependency. ── */
+.home .feature-index-groups{max-width:820px;margin:0 auto}
+.home .feature-index-group{border:1px solid var(--hairline);border-radius:12px;margin:0 0 12px;background:rgba(255,255,255,.55);overflow:hidden}
+.home .feature-index-group summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:16px 20px;font-family:var(--home-font-display);font-size:20px;font-weight:600;color:var(--ink)}
+.home .feature-index-group summary::-webkit-details-marker{display:none}
+.home .feature-index-group summary::before{content:"+";font-family:var(--home-font-mono);font-size:16px;color:var(--home-gold);width:18px;text-align:center;flex:none}
+.home .feature-index-group[open] summary::before{content:"–"}
+.home .feature-index-group summary .count{margin-left:auto;font-family:var(--home-font-mono);font-size:12px;color:var(--ink-dim);background:rgba(30,58,95,.07);padding:2px 10px;border-radius:999px}
+.home .feature-index-group summary:hover{color:var(--home-gold)}
+.home .feature-index-group ul{margin:0;padding:4px 20px 16px 48px;list-style:none}
+.home .feature-index-group li{font-size:15px;line-height:1.6;color:var(--ink-dim);padding:6px 0;border-top:1px solid rgba(28,36,56,.05)}
+.home .feature-index-group li:first-child{border-top:0}
+.home .feature-index-group li strong{color:var(--ink);font-weight:600}
